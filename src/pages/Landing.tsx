@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom'
+
 export default function Landing() {
+  const navigate = useNavigate();
+
   return (
     <main className="min-h-screen flex items-center justify-center px-6">
       <section className="w-full max-w-5xl text-center">
@@ -9,7 +13,7 @@ export default function Landing() {
           </h1>
 
           <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-white sm:text-lg sm:leading-8">
-            Visualize your Crocs designs with ease.
+            Visualize your style with ease.
           </p>
 
           <button
@@ -17,7 +21,7 @@ export default function Landing() {
                        transition-all duration-200 hover:cursor-pointer hover:scale-105 hover:bg-gray-800
                        active:scale-95 sm:px-8 sm:py-4 sm:text-base"
             onClick={() => {
-              window.location.href = "/workbench";
+              navigate('/workbench')
             }}
           >
             Get Started

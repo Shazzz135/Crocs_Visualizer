@@ -162,4 +162,12 @@ export const colors: Color[] = [
       c3: '#e5caff',
     },
   },
+  {
+    color: 'Pink Punch',
+    set: {
+      c1: '#fc0d89',
+      c2: '#fc72b9',
+      c3: '#fc0d89',
+    },
+  },
 ];

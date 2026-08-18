@@ -4,7 +4,7 @@ export default function Landing() {
   const navigate = useNavigate();
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6">
+    <main className="bg-gradient-to-b from-green-600 to-green-900 min-h-screen flex items-center justify-center px-6">
       <section className="w-full max-w-5xl text-center">
         <div className="mx-auto max-w-3xl">
 

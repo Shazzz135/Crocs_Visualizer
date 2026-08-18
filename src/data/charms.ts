@@ -1,0 +1,1 @@
+export const white_chars = '../../public/charms/white_charms.png'

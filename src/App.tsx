@@ -4,18 +4,16 @@ import Landing from './pages/Landing'
 import Bench from './pages/Bench'
 
 function App() {
-
   return (
-    <div className=" min-h-screen">
+    <div className="min-h-screen w-screen">
       <Router>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/workbench" element={<Bench />} />
         </Routes>
-    </Router>
+      </Router>
     </div>
   )
 }
-    
 
 export default App

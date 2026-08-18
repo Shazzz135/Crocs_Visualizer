@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import Clog from '../../../public/clog.png';
+import Clog from '../../../public/shoe/clog.png';
 
 export type GradientConfig = {
   colors: string[];

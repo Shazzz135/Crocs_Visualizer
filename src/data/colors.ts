@@ -125,9 +125,9 @@ export const colors: Color[] = [
   {
     color: 'Field Green',
     set: {
-      c1: '#10371b',
-      c2: '#1a582c',
-      c3: '#10371b',
+      c1: '#0c2c15',
+      c2: '#165326',
+      c3: '#0c2c15',
     },
   },
   {

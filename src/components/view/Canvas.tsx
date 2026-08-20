@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import Clog from '../../../public/shoe/clog.png';
+import { clog } from '../../data/clog';
 
 export type GradientConfig = {
   colors: string[];
@@ -70,7 +70,7 @@ export default function Canvas({
       ctx.drawImage(image, 0, 0);      // Overlay sharp line art on top
     };
 
-    image.src = typeof Clog === 'string' ? Clog : (Clog as { src: string }).src;
+    image.src = typeof clog === 'string' ? clog : (clog as { src: string }).src;
   }, [color]);
 
   return (

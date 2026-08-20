@@ -1,1 +1,3 @@
-export const white_chars = '../../public/charms/white_charms.png'
+import whiteCharsImg from '../assets/charms/white_chars.png';
+
+export const white_chars = whiteCharsImg;

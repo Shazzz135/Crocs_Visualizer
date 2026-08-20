@@ -87,10 +87,13 @@ export default function View({
 
   const renderShoe = (shoeType: 'left' | 'right', isFlipped: boolean) => {
     const shoeCharms = placedCharms.filter((c) => c.shoe === shoeType);
+    const isShoeActive = shoeCharms.some((c) => c.id === activeMenuId);
 
     return (
       <div 
-        className="relative w-[48%] sm:max-w-md scale-[0.85] sm:scale-100 transition-transform origin-center my-0 select-none" 
+        className={`relative w-[48%] sm:max-w-md scale-[0.85] sm:scale-100 transition-transform origin-center my-0 select-none ${
+          isShoeActive ? 'z-40' : 'z-10'
+        }`} 
         onClick={() => setActiveMenuId(null)}
       >
         <ColoredClog color={{ colors: activeColors, angle: 90 }} flipped={isFlipped} />
@@ -101,6 +104,7 @@ export default function View({
             const posY = hole.y;
             const charmInHole = shoeCharms.find((c) => c.holeId === hole.id);
             const hasCharm = !!charmInHole;
+            const isActiveHole = charmInHole && activeMenuId === charmInHole.id;
 
             const isNearTop = posY < 25;
             const isNearBottom = posY > 75;
@@ -129,11 +133,13 @@ export default function View({
                   if (isDragging) executeDrop(hole.id, shoeType);
                 }}
                 className={`absolute flex items-center justify-center -translate-x-1/2 -translate-y-1/2 rounded-full transition-all w-[26%] sm:w-[19.5%] aspect-square ${
-                  isDragging 
-                    ? 'z-40 pointer-events-auto cursor-pointer' 
-                    : hasCharm 
-                      ? 'z-30 pointer-events-auto' 
-                      : 'z-20 pointer-events-auto cursor-pointer'
+                  isActiveHole
+                    ? 'z-50 pointer-events-auto'
+                    : isDragging 
+                      ? 'z-40 pointer-events-auto cursor-pointer' 
+                      : hasCharm 
+                        ? 'z-30 pointer-events-auto' 
+                        : 'z-20 pointer-events-auto cursor-pointer'
                 }`}
                 style={{ left: `${posX}%`, top: `${posY}%` }}
               >
@@ -165,7 +171,7 @@ export default function View({
                     {/* Action Menu */}
                     {activeMenuId === charmInHole.id && !isDragging && (
                       <div 
-                        className={`absolute z-50 flex flex-col items-center gap-2 bg-gray-900/95 border border-gray-700 p-2.5 rounded-xl shadow-2xl backdrop-blur-md cursor-default pointer-events-auto ${verticalAlignClass} ${horizontalPlacementClass}`}
+                        className={`absolute z-[100] flex flex-col items-center gap-2 bg-gray-900/95 border border-gray-700 p-2.5 rounded-xl shadow-2xl backdrop-blur-md cursor-default pointer-events-auto ${verticalAlignClass} ${horizontalPlacementClass}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           e.preventDefault();
@@ -221,7 +227,7 @@ export default function View({
   };
 
   return (
-    <div ref={containerRef} className="flex flex-row w-full max-w-4xl justify-center items-center bg-transparent overflow-x-hidden py-4 -space-x-6 sm:space-x-0 sm:gap-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <div ref={containerRef} className="flex flex-row w-full max-w-4xl justify-center items-center bg-transparent py-4 -space-x-6 sm:space-x-0 sm:gap-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       {renderShoe('left', false)}
       {renderShoe('right', true)}
     </div>

@@ -1,0 +1,40 @@
+name: Quality Gates & CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Code Quality & Hard Limits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Strict File Length Audit (Max 250 Lines)
+        run: node scripts/check-file-length.mjs
+
+      - name: ESLint Check
+        working-directory: frontend
+        run: pnpm run lint
+
+      - name: TypeScript & Build Verification
+        working-directory: frontend
+        run: pnpm run build

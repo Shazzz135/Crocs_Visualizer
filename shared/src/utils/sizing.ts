@@ -12,39 +12,39 @@ export interface PixelCoordinate {
   y: number;
 }
 
-// Proportional dimensions reflecting real-world length-to-width ratios:
-// Infant: ~1.40:1 (stubby, blocky, rounded wide bean)
-// Kids: ~1.58:1 (transitional)
-// Youth: ~1.75:1 (streamlining)
-// Adult: ~1.84:1 (classic elongated anatomical profile)
-export const SHOE_SIZE_DIMENSIONS: Record<
+// Aspect ratio adjustments reflecting real-world anatomy:
+// Infant is stubby and blocky (width preserved/widened while length is compressed)
+export const SHOE_SIZE_SCALES: Record<
   CrocSize,
-  { width: number; height: number; ratio: number }
+  { scaleX: number; scaleY: number; label: string }
 > = {
-  infant: { width: 250, height: 350, ratio: 1.40 },
-  kids: { width: 260, height: 410, ratio: 1.58 },
-  youth: { width: 280, height: 490, ratio: 1.75 },
-  adult: { width: 310, height: 570, ratio: 1.84 },
+  infant: { scaleX: 1.08, scaleY: 0.74, label: 'Infant (Blocky & Wide)' },
+  kids: { scaleX: 0.96, scaleY: 0.84, label: 'Kids (Transitional)' },
+  youth: { scaleX: 0.98, scaleY: 0.92, label: 'Youth (Streamlined)' },
+  adult: { scaleX: 1.00, scaleY: 1.00, label: 'Adult (Classic 1:1)' },
 };
 
-const CANVAS_CENTER_X = 500;
-const CANVAS_CENTER_Y = 325;
-const BASE_SHOE_GAP = 50;
+// Base bounding box from 1000x1000 high-res reference
+const BASE_LEFT_BBOX = { x: 37, y: 21, width: 431, height: 966 };
+const BASE_RIGHT_BBOX = { x: 504, y: 20, width: 431, height: 966 };
+const CANVAS_CENTER_Y = 500;
 
 /**
- * Computes the pixel bounding box for a single shoe based on size and side.
+ * Computes bounding box for left or right shoe adjusted by size proportions.
  */
 export function getShoeBounds(side: ShoeSide, size: CrocSize): BoundingBox {
-  const dims = SHOE_SIZE_DIMENSIONS[size] ?? SHOE_SIZE_DIMENSIONS.adult;
-  const { width, height } = dims;
+  const { scaleX, scaleY } = SHOE_SIZE_SCALES[size] ?? SHOE_SIZE_SCALES.adult;
+  const base = side === 'left' ? BASE_LEFT_BBOX : BASE_RIGHT_BBOX;
 
+  const width = Math.round(base.width * scaleX);
+  const height = Math.round(base.height * scaleY);
   const y = Math.round(CANVAS_CENTER_Y - height / 2);
-  const halfGap = Math.round(BASE_SHOE_GAP / 2);
 
+  // Position relative to canvas center (500)
   const x =
     side === 'left'
-      ? Math.round(CANVAS_CENTER_X - halfGap - width)
-      : Math.round(CANVAS_CENTER_X + halfGap);
+      ? Math.round(485 - width)
+      : Math.round(515);
 
   return { x, y, width, height };
 }

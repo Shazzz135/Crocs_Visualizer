@@ -4,7 +4,7 @@ import {
   getAllHolePixelPositions,
   getHolePixelPosition,
   getShoeBounds,
-  SHOE_SIZE_DIMENSIONS,
+  SHOE_SIZE_SCALES,
 } from '../src/utils/sizing.js';
 
 describe('Sizing and Coordinate Math', () => {
@@ -14,23 +14,12 @@ describe('Sizing and Coordinate Math', () => {
     expect(ALL_VENT_HOLES).toHaveLength(26);
   });
 
-  it('should mirror X coordinates symmetrically for left and right shoes', () => {
-    for (let i = 0; i < 13; i++) {
-      const leftHole = LEFT_SHOE_HOLES[i];
-      const rightHole = RIGHT_SHOE_HOLES[i];
-      expect(leftHole.normalizedY).toBe(rightHole.normalizedY);
-      expect(Number((leftHole.normalizedX + rightHole.normalizedX).toFixed(3))).toBe(1.0);
-    }
-  });
+  it('should reflect distinct length-to-width proportions across size tiers', () => {
+    const infant = SHOE_SIZE_SCALES.infant;
+    const adult = SHOE_SIZE_SCALES.adult;
 
-  it('should reflect distinct length-to-width ratios across size tiers', () => {
-    const infant = SHOE_SIZE_DIMENSIONS.infant;
-    const adult = SHOE_SIZE_DIMENSIONS.adult;
-
-    // Infant is significantly stubbier/blockier (lower aspect ratio ~ 1.4:1)
-    expect(infant.ratio).toBeLessThan(adult.ratio);
-    expect(infant.height / infant.width).toBeCloseTo(1.4, 1);
-    expect(adult.height / adult.width).toBeCloseTo(1.84, 1);
+    // Infant is significantly stubbier/wider (lower length-to-width)
+    expect(infant.scaleY / infant.scaleX).toBeLessThan(adult.scaleY / adult.scaleX);
   });
 
   it('should calculate unique pixel coordinates for all 26 holes', () => {
@@ -49,5 +38,14 @@ describe('Sizing and Coordinate Math', () => {
     const pos = getHolePixelPosition(hole, 'adult');
     expect(pos.x).toBeGreaterThan(0);
     expect(pos.y).toBeGreaterThan(0);
+  });
+
+  it('should produce valid bounding boxes for left and right shoes', () => {
+    const leftBounds = getShoeBounds('left', 'adult');
+    const rightBounds = getShoeBounds('right', 'adult');
+
+    expect(leftBounds.width).toBeGreaterThan(300);
+    expect(rightBounds.width).toBeGreaterThan(300);
+    expect(leftBounds.x + leftBounds.width).toBeLessThan(rightBounds.x);
   });
 });

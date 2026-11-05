@@ -18,6 +18,11 @@ ENV/
 
 # Development Intelligence Generated Knowledge
 graphify-out/
+.agents/
+skills-lock.json
+
+# Ephemeral Reference Assets
+reference/
 
 # Environment and Secrets
 .env

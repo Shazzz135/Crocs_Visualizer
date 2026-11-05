@@ -53,7 +53,7 @@ export const App: React.FC = () => {
         >
           <ShoeCanvas
             size={size}
-            colorHex={color.hex}
+            color={color}
             activeSnapHoleId={activeHole?.id}
             onHoleClick={(hole) => setActiveHole(hole)}
           />

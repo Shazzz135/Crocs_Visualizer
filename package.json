@@ -1,0 +1,11 @@
+{
+  "name": "crocs-visualizer-monorepo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "pnpm --filter @crocs/shared test",
+    "lint": "pnpm --filter frontend lint",
+    "build": "pnpm --filter frontend build",
+    "audit:lines": "node scripts/check-file-length.mjs"
+  }
+}

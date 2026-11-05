@@ -8,6 +8,8 @@ interface VentHoleSocketProps {
   isHovered?: boolean;
   isSnapTarget?: boolean;
   radius?: number;
+  wallColor?: string;
+  highlightColor?: string;
   onSelect?: (hole: VentHole) => void;
 }
 
@@ -17,7 +19,9 @@ export const VentHoleSocket: React.FC<VentHoleSocketProps> = ({
   isOccupied,
   isHovered = false,
   isSnapTarget = false,
-  radius = 9,
+  radius = 11,
+  wallColor = '#141820',
+  highlightColor = 'rgba(255, 255, 255, 0.25)',
   onSelect,
 }) => {
   return (
@@ -32,35 +36,41 @@ export const VentHoleSocket: React.FC<VentHoleSocketProps> = ({
       {/* Target glow ring when snapping or hovered */}
       {(isHovered || isSnapTarget) && (
         <circle
-          r={radius + 6}
+          r={radius + 5.5}
           fill="none"
           stroke="#38bdf8"
-          strokeWidth="2.5"
-          className="animate-pulse opacity-90"
+          strokeWidth="2.4"
+          className="animate-pulse opacity-95"
         />
       )}
 
-      {/* Beveled molded outer rim */}
+      {/* Lower-right rim light catching the beveled hole edge */}
       <circle
-        r={radius + 1.5}
-        fill="rgba(0, 0, 0, 0.25)"
+        cx={0.4}
+        cy={0.8}
+        r={radius + 1.1}
+        fill={highlightColor}
+        opacity={0.45}
       />
 
-      {/* Inner vent hole core */}
+      {/* Molded Croslite foam hole wall thickness */}
       <circle
-        r={radius}
-        fill="#0b0d11"
-        stroke="rgba(255, 255, 255, 0.12)"
-        strokeWidth="1"
+        r={radius + 0.6}
+        fill={wallColor}
       />
 
-      {/* Inner shadow/depth crescent */}
-      <ellipse
-        cx={-radius * 0.2}
-        cy={-radius * 0.2}
-        rx={radius * 0.7}
-        ry={radius * 0.5}
-        fill="rgba(0, 0, 0, 0.4)"
+      {/* Deep recessed interior hole cavity (shifted slightly down for 3D wall thickness) */}
+      <circle
+        cx={0.3}
+        cy={0.9}
+        r={Math.max(2, radius - 0.9)}
+        fill="#0d1017"
+      />
+
+      {/* Top inner wall cast shadow crescent */}
+      <path
+        d={`M ${-radius * 0.78} ${-radius * 0.15} A ${radius * 0.82} ${radius * 0.82} 0 0 1 ${radius * 0.78} ${-radius * 0.15} A ${radius * 0.85} ${radius * 0.58} 0 0 0 ${-radius * 0.78} ${-radius * 0.15} Z`}
+        fill="rgba(0, 0, 0, 0.55)"
       />
     </g>
   );

@@ -1,19 +1,15 @@
-import type { HoleId, VentHole } from '@crocs/shared';
-import React from 'react';
-import {
-  LEFT_COLLAR_PATH,
-  LEFT_HOLES_LOCAL,
-  LEFT_OUTER_PATH,
-  LEFT_STRAP_PATH,
-  RIGHT_COLLAR_PATH,
-  RIGHT_HOLES_LOCAL,
-  RIGHT_OUTER_PATH,
-  RIGHT_STRAP_PATH,
-} from './crocsSvgData.js';
+import type { CrocSize, HoleId, VentHole } from '@crocs/shared';
+import React, { useMemo } from 'react';
+import { FOOTBED_NUBS_PATH } from './crocsNubsData.js';
+import { CLOG_REGIONS, SHOE_VIEWBOX } from './crocsSvgData.js';
+import { computeShoePalette } from './shoeColorUtils.js';
+import { SHOE_HOLES_BY_SIZE } from './shoeHoleConfig.js';
+import { ShoeSvgDefs } from './ShoeSvgDefs.js';
 import { VentHoleSocket } from './VentHoleSocket.js';
 
 interface SingleShoeSvgProps {
   side: 'left' | 'right';
+  size: CrocSize;
   colorHex: string;
   width: number;
   height: number;
@@ -24,6 +20,7 @@ interface SingleShoeSvgProps {
 
 export const SingleShoeSvg: React.FC<SingleShoeSvgProps> = ({
   side,
+  size,
   colorHex,
   width,
   height,
@@ -32,113 +29,121 @@ export const SingleShoeSvg: React.FC<SingleShoeSvgProps> = ({
   onHoleClick,
 }) => {
   const isLeft = side === 'left';
-  const outerPath = isLeft ? LEFT_OUTER_PATH : RIGHT_OUTER_PATH;
-  const collarPath = isLeft ? LEFT_COLLAR_PATH : RIGHT_COLLAR_PATH;
-  const strapPath = isLeft ? LEFT_STRAP_PATH : RIGHT_STRAP_PATH;
-  const holes = isLeft ? LEFT_HOLES_LOCAL : RIGHT_HOLES_LOCAL;
-  const rivetLeftX = isLeft ? 34 : 398;
-  const rivetRightX = isLeft ? 408 : 24;
+  const palette = useMemo(() => computeShoePalette(colorHex), [colorHex]);
+  const sizeHoles = SHOE_HOLES_BY_SIZE[size] ?? SHOE_HOLES_BY_SIZE.adult;
+  const prefix = isLeft ? 'HL' : 'HR';
 
   return (
     <svg
-      viewBox="0 0 432 966"
+      viewBox={`0 0 ${SHOE_VIEWBOX.width} ${SHOE_VIEWBOX.height}`}
       preserveAspectRatio="none"
-      style={{ width: `${width}px`, height: `${height}px` }}
-      className="transition-all duration-300 drop-shadow-2xl overflow-visible"
+      style={{
+        width: `${width}px`,
+        height: `${height}px`,
+        background: 'transparent',
+        pointerEvents: 'none',
+        filter: 'drop-shadow(0 14px 18px rgba(0, 0, 0, 0.48))',
+      }}
+      className="transition-all duration-300 overflow-visible block"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <defs>
-        {/* Footbed depth gradient */}
-        <radialGradient id={`fb-depth-${side}`} cx="50%" cy="60%" r="50%">
-          <stop offset="0%" stopColor="rgba(0, 0, 0, 0.45)" />
-          <stop offset="100%" stopColor="rgba(0, 0, 0, 0.65)" />
-        </radialGradient>
+      <ShoeSvgDefs side={side} palette={palette} />
 
-        {/* Foam highlight gradient */}
-        <linearGradient id={`foam-hi-${side}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="rgba(255, 255, 255, 0.22)" />
-          <stop offset="50%" stopColor="rgba(255, 255, 255, 0.0)" />
-          <stop offset="100%" stopColor="rgba(0, 0, 0, 0.25)" />
-        </linearGradient>
-      </defs>
+      {/* Shoe Geometry Group (Right shoe is the Left shoe mirrored horizontally) */}
+      <g
+        className="pointer-events-auto"
+        transform={
+          isLeft ? undefined : `translate(${SHOE_VIEWBOX.width}, 0) scale(-1, 1)`
+        }
+      >
+        {/* Structural Silhouette & Seam Grooves */}
+        <path
+          d={CLOG_REGIONS.bodySilhouette}
+          fill={palette.seamColor}
+        />
 
-      {/* Ambient floor shadow */}
-      <path
-        d={outerPath}
-        fill="rgba(0, 0, 0, 0.4)"
-        filter="blur(16px)"
-        transform="translate(0, 24)"
-      />
+        {/* Molded Croslite Foam Interior Regions Strictly Clipped to Body Silhouette */}
+        <g clipPath={`url(#shoe-clip-${side})`} filter={`url(#foam-grain-${side})`}>
+          {/* 1. Unified Domed Upper Vamp (Spans seamlessly to the outer edge) */}
+          <path
+            d={CLOG_REGIONS.mainVamp}
+            fill={`url(#vamp-grad-${side})`}
+          />
+          <path
+            d={CLOG_REGIONS.mainVamp}
+            fill={`url(#vamp-sheen-${side})`}
+          />
 
-      {/* Main Molded Croslite Foam Outer Shell */}
-      <path
-        d={outerPath}
-        fill={colorHex}
-        stroke="rgba(0, 0, 0, 0.3)"
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
+          {/* 2. Recessed Concave Footbed */}
+          <path
+            d={CLOG_REGIONS.footbed}
+            fill={`url(#footbed-grad-${side})`}
+          />
+          <path
+            d={CLOG_REGIONS.footbed}
+            fill="none"
+            stroke="rgba(0, 0, 0, 0.25)"
+            strokeWidth="3.5"
+          />
 
-      {/* Foam lighting overlay */}
-      <path
-        d={outerPath}
-        fill={`url(#foam-hi-${side})`}
-        stroke="none"
-      />
+          {/* 3. 3D Embossed Footbed Circulation Nubs (Highlight + Shadow) */}
+          <path
+            d={FOOTBED_NUBS_PATH}
+            fill={palette.nubHighlight}
+            opacity={0.45}
+            transform="translate(-0.5, -0.6)"
+          />
+          <path
+            d={FOOTBED_NUBS_PATH}
+            fill={palette.nubShadow}
+            opacity={0.82}
+          />
 
-      {/* Footbed collar opening (darker recessed foot entrance) */}
-      <path
-        d={collarPath}
-        fill={`url(#fb-depth-${side})`}
-        stroke="rgba(0, 0, 0, 0.5)"
-        strokeWidth="3"
-      />
+          {/* 4. Seamless 360-Degree Raised Tubular Collar Cuff */}
+          <path
+            d={CLOG_REGIONS.collarRim}
+            fill={`url(#collar-grad-${side})`}
+            fillRule="evenodd"
+          />
 
-      {/* Textured footbed massage nubs (concentric dotted rings) */}
-      <g stroke="rgba(255, 255, 255, 0.15)" strokeWidth="3" strokeDasharray="2,14" fill="none">
-        <ellipse cx="216" cy="650" rx="90" ry="170" />
-        <ellipse cx="216" cy="650" rx="65" ry="130" />
-        <ellipse cx="216" cy="650" rx="40" ry="85" />
+          {/* 5. Upright Backstrap & Authentic Side Pivot Rivets */}
+          <path
+            d={CLOG_REGIONS.strapOutline}
+            fill={palette.seamColor}
+          />
+          <path
+            d={CLOG_REGIONS.strapBody}
+            fill={`url(#strap-grad-${side})`}
+          />
+          <path
+            d={CLOG_REGIONS.strapRivets}
+            fill="#111318"
+          />
+        </g>
       </g>
 
-      {/* Pivoting Heel Backstrap */}
-      <path
-        d={strapPath}
-        fill={colorHex}
-        stroke="rgba(0, 0, 0, 0.35)"
-        strokeWidth="3"
-      />
-      <path
-        d={strapPath}
-        fill="rgba(0, 0, 0, 0.15)"
-      />
-
-      {/* Strap Pivot Rivet Buttons (Crocs mascot logo button) */}
-      <g>
-        <circle cx={rivetLeftX} cy="592" r="13" fill="#1e293b" stroke="#64748b" strokeWidth="2" />
-        <circle cx={rivetLeftX} cy="592" r="7" fill="#0f172a" />
-        <circle cx={rivetRightX} cy="592" r="13" fill="#1e293b" stroke="#64748b" strokeWidth="2" />
-        <circle cx={rivetRightX} cy="592" r="7" fill="#0f172a" />
-      </g>
-
-      {/* 13 Authentic Vent Hole Sockets */}
-      <g>
-        {holes.map((h) => {
+      {/* 13 Authentic Vent Hole Sockets (Mirrored automatically for Right Shoe) */}
+      <g data-shoe-interactive="true" className="pointer-events-auto">
+        {sizeHoles.map((h) => {
+          const id = `${prefix}-${String(h.index).padStart(2, '0')}` as HoleId;
+          const x = isLeft ? h.x : Number((SHOE_VIEWBOX.width - h.x).toFixed(1));
           const holeObj: VentHole = {
-            id: h.id as HoleId,
+            id,
             side,
-            index: parseInt(h.id.slice(3), 10),
-            normalizedX: h.x / 432,
-            normalizedY: h.y / 966,
+            index: h.index,
+            normalizedX: Number((x / SHOE_VIEWBOX.width).toFixed(3)),
+            normalizedY: Number((h.y / SHOE_VIEWBOX.height).toFixed(3)),
           };
           return (
             <VentHoleSocket
-              key={h.id}
+              key={id}
               hole={holeObj}
-              position={{ x: h.x, y: h.y }}
-              radius={17}
-              isOccupied={occupiedHoleIds.has(h.id)}
-              isSnapTarget={activeSnapHoleId === h.id}
+              position={{ x, y: h.y }}
+              radius={h.r}
+              wallColor={palette.seamColor}
+              highlightColor={palette.highlightBright}
+              isOccupied={occupiedHoleIds.has(id)}
+              isSnapTarget={activeSnapHoleId === id}
               onSelect={onHoleClick}
             />
           );

@@ -11,11 +11,11 @@ Crocs Visualizer is a client-first, responsive web application structured as a m
 
 1. **`frontend/`**: Single-Page Application (React 19 + TypeScript + Vite + Tailwind CSS v4) rendering the 2D SVG canvas and managing user interactions.
 2. **`shared/`**: Common TypeScript domain types, coordinate matrices, and sizing formulas used across packages.
-3. **`data-pipeline/`**: Python-based batch processing tool for Bright Data ingestion, image background removal, and vector embedding generation.
+3. **`data-pipeline/`**: Python-based batch processing tool for Crocs catalog ingestion, image background removal, and vector embedding generation.
 
 ```mermaid
 flowchart TD
-    BD["Bright Data API (Classic Crocs & Jibbitz)"] --> DP["data-pipeline/ (Python + rembg + embedder)"]
+    BD["Crocs Official Catalog (Classic Crocs & Jibbitz)"] --> DP["data-pipeline/ (Python + rembg + embedder)"]
     DP --> ASSETS["frontend/public/catalog/ (Cleaned PNGs + JSON Catalog + Embeddings)"]
     
     subgraph Frontend Client Browser

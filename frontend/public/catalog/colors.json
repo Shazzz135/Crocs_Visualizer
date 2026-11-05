@@ -1,0 +1,341 @@
+{
+  "totalCount": 56,
+  "colors": [
+    {
+      "id": "black",
+      "name": "Black",
+      "code": "001",
+      "hex": "#000000"
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "code": "100",
+      "hex": "#f9f9f9"
+    },
+    {
+      "id": "deep-dive",
+      "name": "Deep Dive",
+      "code": "5DS",
+      "hex": "#42747a"
+    },
+    {
+      "id": "pond",
+      "name": "Pond",
+      "code": "3YO",
+      "hex": "#64787b"
+    },
+    {
+      "id": "atmosphere",
+      "name": "Atmosphere",
+      "code": "1FT",
+      "hex": "#dddfde"
+    },
+    {
+      "id": "field-green",
+      "name": "Field Green",
+      "code": "3CM",
+      "hex": "#5b6e62"
+    },
+    {
+      "id": "espresso",
+      "name": "Espresso",
+      "code": "206",
+      "hex": "#1a1815"
+    },
+    {
+      "id": "pink-lemonade",
+      "name": "Pink Lemonade",
+      "code": "669",
+      "hex": "#f499bd"
+    },
+    {
+      "id": "slate-grey",
+      "name": "Slate Grey",
+      "code": "0DA",
+      "hex": "#4c4c4c"
+    },
+    {
+      "id": "pink-milk",
+      "name": "Pink Milk",
+      "code": "6ZW",
+      "hex": "#cbb1bc"
+    },
+    {
+      "id": "navy",
+      "name": "Navy",
+      "code": "410",
+      "hex": "#242d36"
+    },
+    {
+      "id": "linen",
+      "name": "Linen",
+      "code": "0HZ",
+      "hex": "#d2d3cb"
+    },
+    {
+      "id": "meteor",
+      "name": "Meteor",
+      "code": "1WY",
+      "hex": "#b7b39d"
+    },
+    {
+      "id": "latte",
+      "name": "Latte",
+      "code": "2Q9",
+      "hex": "#a89076"
+    },
+    {
+      "id": "elephant",
+      "name": "Elephant",
+      "code": "1LM",
+      "hex": "#bfbfb7"
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "code": "862",
+      "hex": "#75311e"
+    },
+    {
+      "id": "court-red",
+      "name": "Court Red",
+      "code": "7CX",
+      "hex": "#91292b"
+    },
+    {
+      "id": "varsity-red",
+      "name": "Varsity Red",
+      "code": "6WC",
+      "hex": "#c74c4f"
+    },
+    {
+      "id": "starfish",
+      "name": "Starfish",
+      "code": "7AH",
+      "hex": "#dc2b2b"
+    },
+    {
+      "id": "golden-light",
+      "name": "Golden Light",
+      "code": "7DR",
+      "hex": "#bf8610"
+    },
+    {
+      "id": "golden-hour",
+      "name": "Golden Hour",
+      "code": "78Z",
+      "hex": "#d5b989"
+    },
+    {
+      "id": "emerald",
+      "name": "Emerald",
+      "code": "302",
+      "hex": "#205249"
+    },
+    {
+      "id": "army-green",
+      "name": "Army Green",
+      "code": "309",
+      "hex": "#74794e"
+    },
+    {
+      "id": "moss",
+      "name": "Moss",
+      "code": "308",
+      "hex": "#85957c"
+    },
+    {
+      "id": "blue-frost",
+      "name": "Blue Frost",
+      "code": "4WK",
+      "hex": "#aab8cb"
+    },
+    {
+      "id": "turbo-teal",
+      "name": "Turbo Teal",
+      "code": "3AY",
+      "hex": "#61c7d2"
+    },
+    {
+      "id": "blue-bolt",
+      "name": "Blue Bolt",
+      "code": "4KZ",
+      "hex": "#1480dd"
+    },
+    {
+      "id": "nightshade",
+      "name": "Nightshade",
+      "code": "5CI",
+      "hex": "#494054"
+    },
+    {
+      "id": "mystic-purple",
+      "name": "Mystic Purple",
+      "code": "5BN",
+      "hex": "#9397c5"
+    },
+    {
+      "id": "lavender",
+      "name": "Lavender",
+      "code": "530",
+      "hex": "#b4a5c0"
+    },
+    {
+      "id": "royal-pink",
+      "name": "Royal Pink",
+      "code": "7DQ",
+      "hex": "#8b1d4a"
+    },
+    {
+      "id": "frapp\u00e9",
+      "name": "Frapp\u00e9",
+      "code": "2MC",
+      "hex": "#c1baad"
+    },
+    {
+      "id": "powder-pink",
+      "name": "Powder Pink",
+      "code": "78U",
+      "hex": "#c08882"
+    },
+    {
+      "id": "tac",
+      "name": "Tac",
+      "code": "2CU",
+      "hex": "#a0a184"
+    },
+    {
+      "id": "blue-haze",
+      "name": "Blue Haze",
+      "code": "453",
+      "hex": "#a4bfc8"
+    },
+    {
+      "id": "concrete",
+      "name": "Concrete",
+      "code": "0Z3",
+      "hex": "#738380"
+    },
+    {
+      "id": "mint-tint",
+      "name": "Mint Tint",
+      "code": "3YF",
+      "hex": "#b7c8ba"
+    },
+    {
+      "id": "guava",
+      "name": "Guava",
+      "code": "6UI",
+      "hex": "#f49798"
+    },
+    {
+      "id": "yellow-light",
+      "name": "Yellow Light",
+      "code": "7CJ",
+      "hex": "#faedb8"
+    },
+    {
+      "id": "electric-sunstone",
+      "name": "Electric Sunstone",
+      "code": "86A",
+      "hex": "#dc8f74"
+    },
+    {
+      "id": "taupe",
+      "name": "Taupe",
+      "code": "214",
+      "hex": "#978f7b"
+    },
+    {
+      "id": "heritage-red",
+      "name": "Heritage Red",
+      "code": "7CU",
+      "hex": "#572a34"
+    },
+    {
+      "id": "utility-orange",
+      "name": "Utility Orange",
+      "code": "86M",
+      "hex": "#da8e57"
+    },
+    {
+      "id": "meadow",
+      "name": "Meadow",
+      "code": "2DB",
+      "hex": "#543b35"
+    },
+    {
+      "id": "grape-ice",
+      "name": "Grape Ice",
+      "code": "5DK",
+      "hex": "#c3c0c7"
+    },
+    {
+      "id": "dusty-lilac",
+      "name": "Dusty Lilac",
+      "code": "5EO",
+      "hex": "#a68f97"
+    },
+    {
+      "id": "astro-blue",
+      "name": "Astro Blue",
+      "code": "5EP",
+      "hex": "#707f97"
+    },
+    {
+      "id": "quartz",
+      "name": "Quartz",
+      "code": "6UR",
+      "hex": "#b3a39b"
+    },
+    {
+      "id": "bone",
+      "name": "Bone",
+      "code": "2Y2",
+      "hex": "#dbd6c6"
+    },
+    {
+      "id": "wheat",
+      "name": "Wheat",
+      "code": "209",
+      "hex": "#f3ce8e"
+    },
+    {
+      "id": "turmeric",
+      "name": "Turmeric",
+      "code": "7AG",
+      "hex": "#ce8e28"
+    },
+    {
+      "id": "purple-halo",
+      "name": "Purple Halo",
+      "code": "0UJ",
+      "hex": "#9b8ea7"
+    },
+    {
+      "id": "tac-green",
+      "name": "Tac Green",
+      "code": "3DD",
+      "hex": "#b7b390"
+    },
+    {
+      "id": "pink-punch",
+      "name": "Pink Punch",
+      "code": "7EK",
+      "hex": "#eb75a9"
+    },
+    {
+      "id": "strawberry-wine",
+      "name": "Strawberry Wine",
+      "code": "6XJ",
+      "hex": "#7a484f"
+    },
+    {
+      "id": "cyber-yellow",
+      "name": "Cyber Yellow",
+      "code": "77J",
+      "hex": "#d8c82a"
+    }
+  ]
+}

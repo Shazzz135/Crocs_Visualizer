@@ -1,0 +1,77 @@
+import type { PixelCoordinate, VentHole } from '@crocs/shared';
+import React from 'react';
+
+interface VentHoleSocketProps {
+  hole: VentHole;
+  position: PixelCoordinate;
+  isOccupied: boolean;
+  isHovered?: boolean;
+  isSnapTarget?: boolean;
+  radius?: number;
+  wallColor?: string;
+  highlightColor?: string;
+  onSelect?: (hole: VentHole) => void;
+}
+
+export const VentHoleSocket: React.FC<VentHoleSocketProps> = ({
+  hole,
+  position,
+  isOccupied,
+  isHovered = false,
+  isSnapTarget = false,
+  radius = 11,
+  wallColor = '#141820',
+  highlightColor = 'rgba(255, 255, 255, 0.25)',
+  onSelect,
+}) => {
+  return (
+    <g
+      className="cursor-pointer transition-transform duration-150"
+      transform={`translate(${position.x}, ${position.y})`}
+      onClick={() => onSelect?.(hole)}
+      role="button"
+      tabIndex={0}
+      aria-label={`Vent hole ${hole.id}${isOccupied ? ' (occupied)' : ' (empty)'}`}
+    >
+      {/* Target glow ring when snapping or hovered */}
+      {(isHovered || isSnapTarget) && (
+        <circle
+          r={radius + 5.5}
+          fill="none"
+          stroke="#38bdf8"
+          strokeWidth="2.4"
+          className="animate-pulse opacity-95"
+        />
+      )}
+
+      {/* Lower-right rim light catching the beveled hole edge */}
+      <circle
+        cx={0.4}
+        cy={0.8}
+        r={radius + 1.1}
+        fill={highlightColor}
+        opacity={0.45}
+      />
+
+      {/* Molded Croslite foam hole wall thickness */}
+      <circle
+        r={radius + 0.6}
+        fill={wallColor}
+      />
+
+      {/* Deep recessed interior hole cavity (shifted slightly down for 3D wall thickness) */}
+      <circle
+        cx={0.3}
+        cy={0.9}
+        r={Math.max(2, radius - 0.9)}
+        fill="#0d1017"
+      />
+
+      {/* Top inner wall cast shadow crescent */}
+      <path
+        d={`M ${-radius * 0.78} ${-radius * 0.15} A ${radius * 0.82} ${radius * 0.82} 0 0 1 ${radius * 0.78} ${-radius * 0.15} A ${radius * 0.85} ${radius * 0.58} 0 0 0 ${-radius * 0.78} ${-radius * 0.15} Z`}
+        fill="rgba(0, 0, 0, 0.55)"
+      />
+    </g>
+  );
+};

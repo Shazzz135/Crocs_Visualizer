@@ -1,4 +1,3 @@
-import { SIZE_SCALE_FACTORS } from '../constants/holes.js';
 import type { CrocSize, ShoeSide, VentHole } from '../types/crocs.js';
 
 export interface BoundingBox {
@@ -13,27 +12,39 @@ export interface PixelCoordinate {
   y: number;
 }
 
-// Base unscaled shoe dimensions on a reference 1000x650 viewport
-const BASE_SHOE_WIDTH = 340;
-const BASE_SHOE_HEIGHT = 540;
-const CANVAS_CENTER_X = 500;
-const CANVAS_CENTER_Y = 325;
-const SHOE_GAP = 60; // Gap between left and right shoes
+// Aspect ratio adjustments reflecting real-world anatomy:
+// Infant is stubby and blocky (width preserved/widened while length is compressed)
+export const SHOE_SIZE_SCALES: Record<
+  CrocSize,
+  { scaleX: number; scaleY: number; label: string }
+> = {
+  infant: { scaleX: 1.08, scaleY: 0.74, label: 'Infant (Blocky & Wide)' },
+  kids: { scaleX: 0.96, scaleY: 0.84, label: 'Kids (Transitional)' },
+  youth: { scaleX: 0.98, scaleY: 0.92, label: 'Youth (Streamlined)' },
+  adult: { scaleX: 1.00, scaleY: 1.00, label: 'Adult (Classic 1:1)' },
+};
+
+// Base bounding box from 1000x1000 high-res reference
+const BASE_LEFT_BBOX = { x: 37, y: 21, width: 431, height: 966 };
+const BASE_RIGHT_BBOX = { x: 504, y: 20, width: 431, height: 966 };
+const CANVAS_CENTER_Y = 500;
 
 /**
- * Computes the pixel bounding box for a single shoe based on size and side.
+ * Computes bounding box for left or right shoe adjusted by size proportions.
  */
 export function getShoeBounds(side: ShoeSide, size: CrocSize): BoundingBox {
-  const scale = SIZE_SCALE_FACTORS[size] ?? 1.0;
-  const width = Math.round(BASE_SHOE_WIDTH * scale);
-  const height = Math.round(BASE_SHOE_HEIGHT * scale);
-  const halfGap = Math.round((SHOE_GAP * scale) / 2);
+  const { scaleX, scaleY } = SHOE_SIZE_SCALES[size] ?? SHOE_SIZE_SCALES.adult;
+  const base = side === 'left' ? BASE_LEFT_BBOX : BASE_RIGHT_BBOX;
 
+  const width = Math.round(base.width * scaleX);
+  const height = Math.round(base.height * scaleY);
   const y = Math.round(CANVAS_CENTER_Y - height / 2);
+
+  // Position relative to canvas center (500)
   const x =
     side === 'left'
-      ? Math.round(CANVAS_CENTER_X - halfGap - width)
-      : Math.round(CANVAS_CENTER_X + halfGap);
+      ? Math.round(485 - width)
+      : Math.round(515);
 
   return { x, y, width, height };
 }

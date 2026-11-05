@@ -19,7 +19,7 @@ The Crocs Visualizer is a fully static client-side application with zero server-
 Create `.env` in `frontend/`:
 
 ```env
-# Optional: Bright Data or external API keys (used only in data-pipeline/)
+# Safe public frontend configuration
 VITE_APP_VERSION=1.0.0-beta
 VITE_ENABLE_DISCLAIMERS=true
 ```

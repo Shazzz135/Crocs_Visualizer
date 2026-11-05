@@ -1,0 +1,44 @@
+name: Bi-Weekly Catalog Sync
+
+on:
+  schedule:
+    # Runs at 06:00 UTC on the 1st and 15th of every month
+    - cron: '0 6 1,15 * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI anytime
+
+permissions:
+  contents: write
+
+jobs:
+  sync-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install Pillow numpy requests rembg onnxruntime
+
+      - name: Run Catalog Ingestion & Image Processor
+        run: |
+          python data-pipeline/sync_catalog.py
+
+      - name: Commit and push if catalog updated
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/catalog/
+          if git diff --staged --quiet; then
+            echo "No new catalog changes detected."
+          else
+            git commit -m "chore(catalog): automated bi-weekly Crocs Jibbitz catalog sync"
+            git push
+          fi

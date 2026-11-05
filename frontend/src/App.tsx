@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShoeCanvas } from './components/canvas/ShoeCanvas.js';
 import { ColorPalette } from './components/controls/ColorPalette.js';
+import { JibbitzPreviewPanel } from './components/controls/JibbitzPreviewPanel.js';
 import { SizeSelector } from './components/controls/SizeSelector.js';
 import { useShoeCustomizer } from './hooks/useShoeCustomizer.js';
 
@@ -39,6 +40,9 @@ export const App: React.FC = () => {
 
           {/* Colorway Swatches */}
           <ColorPalette selectedColorId={color.id} onSelectColor={setColor} />
+
+          {/* Jibbitz Catalog Preview */}
+          <JibbitzPreviewPanel />
         </aside>
 
         {/* Right Pair Preview Window */}

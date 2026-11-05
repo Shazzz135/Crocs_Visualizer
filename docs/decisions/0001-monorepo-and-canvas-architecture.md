@@ -7,7 +7,7 @@
 ---
 
 ## Context
-We need to provide an interactive visualizer for Classic Crocs footwear allowing color selection, size scaling, charm placement on 26 vent holes, rotation, and deletion. The application requires an ingestion pipeline for Bright Data and high performance on mobile devices.
+We need to provide an interactive visualizer for Classic Crocs footwear allowing color selection, size scaling, charm placement on 26 vent holes, rotation, and deletion. The application requires an authentic Crocs catalog ingestion pipeline and high performance on mobile devices.
 
 ---
 

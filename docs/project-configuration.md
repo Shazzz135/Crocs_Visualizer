@@ -58,7 +58,7 @@ Because this application may be demonstrated or tested in real-world retail envi
 | **2D Interactive Canvas** | Custom SVG Canvas | Vector-sharp top-down rendering, coordinate mapping, and rotation. |
 | **Drag & Drop** | `@dnd-kit` (Core + Modifiers) | Touch and mouse drag-and-drop with magnetic snapping to hole coordinates. |
 | **Embeddings & Search** | Local vector embeddings index | Instant in-browser semantic similarity search for Jibbitz. |
-| **Data Ingestion** | Python CLI / scripts | Batch ingestion from Bright Data, `rembg` background removal, scale normalization. |
+| **Data Ingestion** | Python CLI / scripts | Batch ingestion of authentic Crocs catalog, `rembg` background removal, scale normalization. |
 | **State & Persistence** | Zustand + `localStorage` | Fast state management with automatic local persistence. |
 | **Quality & CI** | ESLint 9 + Prettier + GitHub Actions | Automated linting, type safety, test execution, and 250-line file limits. |
 | **Development Intelligence** | Ponytail + Graphify (`graphifyy`) | YAGNI code simplification and automated codebase knowledge graphs. |

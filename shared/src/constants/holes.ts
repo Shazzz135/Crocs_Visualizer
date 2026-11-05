@@ -37,14 +37,28 @@ export const SIZE_SCALE_FACTORS: Record<CrocSize, number> = {
   adult: 1.00,
 };
 
-// Standard authentic Crocs colorways
+// Standard authentic Crocs Classic Clog colorways (official Crocs colors and codes)
 export const DEFAULT_CROC_COLORS: CrocColor[] = [
-  { id: 'juice', name: 'Juice Red (Classic)', hex: '#E53E3E' },
-  { id: 'black', name: 'Black', hex: '#1C1D1F' },
-  { id: 'white', name: 'White', hex: '#F3F4F6' },
-  { id: 'navy', name: 'Navy Blue', hex: '#1A2942' },
-  { id: 'lime-zest', name: 'Lime Zest', hex: '#A3D933' },
-  { id: 'digital-violet', name: 'Digital Violet', hex: '#6D4C8C' },
-  { id: 'ballerina-pink', name: 'Ballerina Pink', hex: '#F9C5D1' },
-  { id: 'atmosphere', name: 'Atmosphere Gray', hex: '#A0AEC0' },
+  { id: 'black', name: 'Black', hex: '#000000' },
+  { id: 'white', name: 'White', hex: '#F9F9F9' },
+  { id: 'navy', name: 'Navy', hex: '#242D36' },
+  { id: 'bone', name: 'Bone', hex: '#DBD6C6' },
+  { id: 'atmosphere', name: 'Atmosphere', hex: '#DDDFDE' },
+  { id: 'espresso', name: 'Espresso', hex: '#1A1815' },
+  { id: 'slate-grey', name: 'Slate Grey', hex: '#4C4C4C' },
+  { id: 'army-green', name: 'Army Green', hex: '#74794E' },
+  { id: 'lavender', name: 'Lavender', hex: '#B4A5C0' },
+  { id: 'pink-lemonade', name: 'Pink Lemonade', hex: '#F499BD' },
+  { id: 'quartz', name: 'Quartz', hex: '#B3A39B' },
+  { id: 'emerald', name: 'Emerald', hex: '#205249' },
+  { id: 'latte', name: 'Latte', hex: '#A89076' },
+  { id: 'elephant', name: 'Elephant', hex: '#BFBFB7' },
+  { id: 'starfish', name: 'Starfish', hex: '#DC2B2B' },
+  { id: 'varsity-red', name: 'Varsity Red', hex: '#C74C4F' },
+  { id: 'blue-bolt', name: 'Blue Bolt', hex: '#1480DD' },
+  { id: 'turbo-teal', name: 'Turbo Teal', hex: '#61C7D2' },
+  { id: 'blue-frost', name: 'Blue Frost', hex: '#AAB8CB' },
+  { id: 'moss', name: 'Moss', hex: '#85957C' },
+  { id: 'linen', name: 'Linen', hex: '#D2D3CB' },
+  { id: 'butter', name: 'Butter', hex: '#F2E97D' },
 ];

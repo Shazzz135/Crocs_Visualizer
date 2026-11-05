@@ -4,6 +4,7 @@ import {
   getAllHolePixelPositions,
   getHolePixelPosition,
   getShoeBounds,
+  SHOE_SIZE_DIMENSIONS,
 } from '../src/utils/sizing.js';
 
 describe('Sizing and Coordinate Math', () => {
@@ -22,13 +23,14 @@ describe('Sizing and Coordinate Math', () => {
     }
   });
 
-  it('should scale shoe bounding boxes proportionally by size category', () => {
-    const adultBounds = getShoeBounds('left', 'adult');
-    const infantBounds = getShoeBounds('left', 'infant');
+  it('should reflect distinct length-to-width ratios across size tiers', () => {
+    const infant = SHOE_SIZE_DIMENSIONS.infant;
+    const adult = SHOE_SIZE_DIMENSIONS.adult;
 
-    expect(adultBounds.width).toBeGreaterThan(infantBounds.width);
-    expect(adultBounds.height).toBeGreaterThan(infantBounds.height);
-    expect(infantBounds.width / adultBounds.width).toBeCloseTo(0.68, 1);
+    // Infant is significantly stubbier/blockier (lower aspect ratio ~ 1.4:1)
+    expect(infant.ratio).toBeLessThan(adult.ratio);
+    expect(infant.height / infant.width).toBeCloseTo(1.4, 1);
+    expect(adult.height / adult.width).toBeCloseTo(1.84, 1);
   });
 
   it('should calculate unique pixel coordinates for all 26 holes', () => {

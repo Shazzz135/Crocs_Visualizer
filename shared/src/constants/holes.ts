@@ -1,4 +1,4 @@
-import type { CrocColor, CrocSize, LeftHoleId, RightHoleId, VentHole } from '../types/crocs.js';
+import type { CrocColor, CrocSize, RightHoleId, VentHole } from '../types/crocs.js';
 
 // 13 holes for the Left Shoe on normalized (0..1) shoe bounding box
 export const LEFT_SHOE_HOLES: VentHole[] = [

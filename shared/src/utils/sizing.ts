@@ -1,4 +1,3 @@
-import { SIZE_SCALE_FACTORS } from '../constants/holes.js';
 import type { CrocSize, ShoeSide, VentHole } from '../types/crocs.js';
 
 export interface BoundingBox {
@@ -13,23 +12,35 @@ export interface PixelCoordinate {
   y: number;
 }
 
-// Base unscaled shoe dimensions on a reference 1000x650 viewport
-const BASE_SHOE_WIDTH = 340;
-const BASE_SHOE_HEIGHT = 540;
+// Proportional dimensions reflecting real-world length-to-width ratios:
+// Infant: ~1.40:1 (stubby, blocky, rounded wide bean)
+// Kids: ~1.58:1 (transitional)
+// Youth: ~1.75:1 (streamlining)
+// Adult: ~1.84:1 (classic elongated anatomical profile)
+export const SHOE_SIZE_DIMENSIONS: Record<
+  CrocSize,
+  { width: number; height: number; ratio: number }
+> = {
+  infant: { width: 250, height: 350, ratio: 1.40 },
+  kids: { width: 260, height: 410, ratio: 1.58 },
+  youth: { width: 280, height: 490, ratio: 1.75 },
+  adult: { width: 310, height: 570, ratio: 1.84 },
+};
+
 const CANVAS_CENTER_X = 500;
 const CANVAS_CENTER_Y = 325;
-const SHOE_GAP = 60; // Gap between left and right shoes
+const BASE_SHOE_GAP = 50;
 
 /**
  * Computes the pixel bounding box for a single shoe based on size and side.
  */
 export function getShoeBounds(side: ShoeSide, size: CrocSize): BoundingBox {
-  const scale = SIZE_SCALE_FACTORS[size] ?? 1.0;
-  const width = Math.round(BASE_SHOE_WIDTH * scale);
-  const height = Math.round(BASE_SHOE_HEIGHT * scale);
-  const halfGap = Math.round((SHOE_GAP * scale) / 2);
+  const dims = SHOE_SIZE_DIMENSIONS[size] ?? SHOE_SIZE_DIMENSIONS.adult;
+  const { width, height } = dims;
 
   const y = Math.round(CANVAS_CENTER_Y - height / 2);
+  const halfGap = Math.round(BASE_SHOE_GAP / 2);
+
   const x =
     side === 'left'
       ? Math.round(CANVAS_CENTER_X - halfGap - width)

@@ -33,6 +33,7 @@ export interface PlacedJibbitz {
   holeId: HoleId;
   rotationDeg: number; // 0 to 359
   placedAt: number; // epoch timestamp
+  charm?: JibbitzItem; // cached charm metadata for instant rendering
 }
 
 export interface CustomizationState {

@@ -18,9 +18,9 @@ export interface ShoeDisplaySpec {
  * Infant is intentionally wider/stubbier (lower height-to-width ratio) than Adult.
  */
 export const SHOE_DISPLAY_SIZES: Record<CrocSize, ShoeDisplaySpec> = {
-  infant: { width: 176, height: 320, label: 'Infant (Blocky & Wide)' },
-  kids: { width: 186, height: 376, label: 'Kids (Transitional)' },
-  youth: { width: 198, height: 422, label: 'Youth (Streamlined)' },
+  infant: { width: 156, height: 350, label: 'Infant' },
+  kids: { width: 172, height: 386, label: 'Kids' },
+  youth: { width: 190, height: 426, label: 'Youth' },
   adult: { width: 210, height: 472, label: 'Adult (Classic 1:1)' },
 };
 

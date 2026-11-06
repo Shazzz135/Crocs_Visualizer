@@ -13,3 +13,9 @@ export * from './utils/collision.js';
 
 // Semantic vector search & discovery engine
 export * from './utils/search.js';
+
+// Rotation & Angle calculation
+export * from './utils/rotation.js';
+
+// Deliberate 3-click deletion engine
+export * from './utils/deletion.js';

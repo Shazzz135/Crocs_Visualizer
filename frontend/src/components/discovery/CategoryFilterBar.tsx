@@ -39,7 +39,7 @@ export const CategoryFilterBar: React.FC<CategoryFilterBarProps> = ({
             className={`px-2.5 py-1 text-xs rounded-full font-medium whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
               isSelected
                 ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm shadow-emerald-500/30 ring-1 ring-emerald-400'
-                : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800/80'
+                : 'bg-[#02130e]/90 text-emerald-300/90 hover:text-white hover:bg-[#06241a] border border-emerald-900/80'
             }`}
           >
             <span>{label}</span>
@@ -48,7 +48,7 @@ export const CategoryFilterBar: React.FC<CategoryFilterBarProps> = ({
                 className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${
                   isSelected
                     ? 'bg-emerald-600/40 text-slate-950'
-                    : 'bg-slate-800 text-slate-400'
+                    : 'bg-emerald-950 text-emerald-400/90 border border-emerald-900/60'
                 }`}
               >
                 {count}

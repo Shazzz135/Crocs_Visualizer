@@ -15,9 +15,9 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
 }) => {
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800/60 my-auto">
+      <div className="flex flex-col items-center justify-center p-8 text-center text-emerald-400/80 bg-[#02130e]/90 rounded-xl border border-emerald-900/80 my-auto">
         <svg
-          className="w-8 h-8 mb-2 text-slate-600"
+          className="w-8 h-8 mb-2 text-emerald-600"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -29,10 +29,10 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
             d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <p className="text-xs font-semibold text-slate-400">
+        <p className="text-xs font-semibold text-emerald-200">
           No matching Jibbitz found
         </p>
-        <p className="text-[11px] text-slate-500 mt-1 max-w-xs">
+        <p className="text-[11px] text-emerald-400/70 mt-1 max-w-xs">
           Try a different keyword or toggle more category filters.
         </p>
       </div>
@@ -45,7 +45,7 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
       <div
         tabIndex={0}
         aria-label="Jibbitz charms catalog grid"
-        className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-2 overflow-y-auto p-2 bg-slate-950/70 rounded-xl border border-slate-800/80 scrollbar-thin scrollbar-thumb-emerald-900/60 scrollbar-track-transparent flex-1 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+        className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-2 overflow-y-auto p-2 bg-[#02130e]/90 rounded-xl border border-emerald-900/80 scrollbar-thin scrollbar-thumb-emerald-800 scrollbar-track-transparent flex-1 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
       >
         {items.map((item) => {
           const isSelected = selectedCharmId === item.id;
@@ -60,8 +60,8 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
               title={`${item.name} (${item.category})`}
               className={`group relative flex flex-col items-center justify-center p-2 rounded-xl border transition-all aspect-square focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer ${
                 isSelected
-                  ? 'border-emerald-400 bg-emerald-950/50 shadow-md shadow-emerald-500/25 ring-1 ring-emerald-400'
-                  : 'border-slate-800/90 hover:border-slate-700 bg-slate-900/50 hover:bg-slate-900/90'
+                  ? 'border-emerald-400 bg-emerald-950/90 shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400'
+                  : 'border-emerald-950/80 hover:border-emerald-700/70 bg-[#06241a]/70 hover:bg-[#0a3a2b]'
               }`}
             >
               {/* Scaled thumbnail with transparent crisp display */}
@@ -75,7 +75,7 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
               </div>
 
               {/* Title label */}
-              <span className="text-[10px] text-slate-400 group-hover:text-slate-200 truncate w-full text-center mt-1 transition-colors">
+              <span className="text-[10px] text-emerald-300/80 group-hover:text-emerald-100 truncate w-full text-center mt-1 transition-colors">
                 {item.name}
               </span>
 
@@ -83,7 +83,7 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
               {score !== undefined && score > 0.8 && (
                 <span
                   title="Semantic Match"
-                  className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-slate-950"
+                  className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-emerald-950"
                 />
               )}
             </button>

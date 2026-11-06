@@ -78,7 +78,7 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
 
   if (!catalog) {
     return (
-      <div className="flex items-center justify-center p-6 text-xs text-slate-500 animate-pulse">
+      <div className="flex items-center justify-center p-6 text-xs text-emerald-400 animate-pulse font-medium">
         Loading Jibbitz charms catalog...
       </div>
     );

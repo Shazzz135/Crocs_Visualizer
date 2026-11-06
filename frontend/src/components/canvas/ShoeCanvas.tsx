@@ -54,17 +54,17 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
         isPanning ? 'cursor-grabbing' : 'cursor-grab'
       }`}
     >
-      {/* Floating Zoom Controls (Crocs Green Themed, Clean Icons, No % indicator) */}
+      {/* Floating Zoom Controls (Dark Green Crocs HUD) */}
       <div
         data-zoom-hud="true"
-        className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex items-center gap-1 bg-slate-900/90 border border-slate-800 rounded-lg px-2 py-1 backdrop-blur-md shadow-lg cursor-default"
+        className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex items-center gap-1 bg-[#06241a]/95 border border-emerald-900/80 rounded-lg px-2 py-1 backdrop-blur-md shadow-xl cursor-default"
       >
         <button
           type="button"
           onClick={zoomOut}
           aria-label="Zoom out"
           title="Zoom out"
-          className="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-emerald-400 hover:bg-slate-800 transition-colors text-sm font-bold cursor-pointer"
+          className="w-6 h-6 flex items-center justify-center rounded text-emerald-300 hover:text-white hover:bg-emerald-900/60 transition-colors text-sm font-bold cursor-pointer"
         >
           −
         </button>
@@ -73,7 +73,7 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
           onClick={resetZoom}
           aria-label="Reset zoom"
           title="Reset canvas"
-          className="px-1.5 py-0.5 text-xs text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded transition-colors cursor-pointer"
+          className="px-1.5 py-0.5 text-xs text-emerald-400 hover:text-white hover:bg-emerald-900/60 rounded transition-colors cursor-pointer"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -84,7 +84,7 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
           onClick={zoomIn}
           aria-label="Zoom in"
           title="Zoom in"
-          className="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-emerald-400 hover:bg-slate-800 transition-colors text-sm font-bold cursor-pointer"
+          className="w-6 h-6 flex items-center justify-center rounded text-emerald-300 hover:text-white hover:bg-emerald-900/60 transition-colors text-sm font-bold cursor-pointer"
         >
           +
         </button>

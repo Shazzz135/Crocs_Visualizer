@@ -20,7 +20,7 @@ export const ShoeColorTab: React.FC<ShoeColorTabProps> = ({
   onNavigateToCharms,
 }) => {
   return (
-    <div className="flex flex-col gap-4 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800">
+    <div className="flex flex-col gap-4 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-emerald-900 scrollbar-track-transparent">
       {/* Size Bracket Selector */}
       <div className="flex flex-col gap-1.5">
         <SizeSelector selectedSize={size} onSelectSize={onSelectSize} />
@@ -32,7 +32,7 @@ export const ShoeColorTab: React.FC<ShoeColorTabProps> = ({
           <label className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
             Croc Colorway ({DEFAULT_CROC_COLORS.length})
           </label>
-          <span className="text-xs font-semibold text-white bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+          <span className="text-xs font-semibold text-emerald-200 bg-[#02130e] px-2 py-0.5 rounded border border-emerald-800/80">
             {color.name}
           </span>
         </div>
@@ -45,7 +45,7 @@ export const ShoeColorTab: React.FC<ShoeColorTabProps> = ({
           <button
             type="button"
             onClick={onNavigateToCharms}
-            className="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer"
+            className="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-emerald-500/30 flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer"
           >
             <span>Next: Browse &amp; Add Jibbitz™ Charms</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

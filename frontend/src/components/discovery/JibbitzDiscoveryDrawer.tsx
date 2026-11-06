@@ -85,7 +85,7 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 h-full w-full gap-3">
+    <div className="flex flex-col flex-1 min-h-0 h-full w-full gap-2 sm:gap-2.5 overflow-hidden">
       {/* Search Bar with AI Semantic Indicator */}
       <SearchBar
         value={searchQuery}

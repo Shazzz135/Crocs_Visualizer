@@ -20,10 +20,10 @@ export const App: React.FC = () => {
         {/* Left Editing Window (Desktop Side Panel / Mobile Bottom Sheet) */}
         <aside
           aria-label="Customizer editing workspace"
-          className={`w-full md:w-[420px] lg:w-[450px] border-t md:border-t-0 md:border-r border-emerald-900/60 bg-[#06241a]/95 p-3.5 sm:p-4 md:p-5 flex flex-col gap-3 backdrop-blur-md shrink-0 z-20 shadow-2xl transition-all duration-300 ${
+          className={`w-full md:w-[420px] lg:w-[450px] border-t md:border-t-0 md:border-r border-emerald-900/60 bg-[#06241a]/95 p-3 sm:p-4 md:p-5 flex flex-col gap-2.5 sm:gap-3 backdrop-blur-md shrink-0 z-20 shadow-2xl transition-all duration-300 ${
             isMobileExpanded
-              ? 'h-[85vh] fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
-              : 'h-[50vh] md:h-full'
+              ? 'h-[88dvh] fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
+              : 'h-[58dvh] md:h-full'
           }`}
         >
           {/* Mobile Drag / Height Toggle Handle (< 768px) */}
@@ -42,8 +42,8 @@ export const App: React.FC = () => {
           </div>
 
           {/* App Header with Crocs Brand Badge */}
-          <div className="flex items-center justify-between border-b border-emerald-900/60 pb-3 shrink-0">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between border-b border-emerald-900/60 pb-2.5 sm:pb-3 shrink-0">
+            <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-500/20 border border-emerald-400 flex items-center justify-center font-black text-emerald-400 text-sm shadow-sm shadow-emerald-500/20">
                 CV
               </div>
@@ -104,8 +104,8 @@ export const App: React.FC = () => {
             </button>
           </div>
 
-          {/* Active Tool Content: Fills Entire Available Window Space */}
-          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+          {/* Active Tool Content: Fills Entire Available Window Space with touch scrolling enabled */}
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden touch-pan-y">
             {activeTab === 'shoe' ? (
               <ShoeColorTab
                 size={size}

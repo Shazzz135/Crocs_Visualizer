@@ -40,12 +40,16 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-2 min-h-0 flex-1">
-      {/* Scrollable Grid with All Charms Always Loaded */}
+    <div className="flex flex-col flex-1 min-h-0 w-full">
+      {/* Scrollable Grid with All Charms Always Loaded - touch-pan-y enabled for mobile */}
       <div
         tabIndex={0}
         aria-label="Jibbitz charms catalog grid"
-        className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-2 overflow-y-auto p-2 bg-[#02130e]/90 rounded-xl border border-emerald-900/80 scrollbar-thin scrollbar-thumb-emerald-800 scrollbar-track-transparent flex-1 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y',
+        }}
+        className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-2 overflow-y-auto overscroll-contain touch-pan-y p-2 bg-[#02130e]/90 rounded-xl border border-emerald-900/80 scrollbar-thin scrollbar-thumb-emerald-800 scrollbar-track-transparent flex-1 min-h-0 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
       >
         {items.map((item) => {
           const isSelected = selectedCharmId === item.id;
@@ -58,24 +62,24 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
               type="button"
               onClick={() => onSelectCharm(item)}
               title={`${item.name} (${item.category})`}
-              className={`group relative flex flex-col items-center justify-center p-2 rounded-xl border transition-all aspect-square focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer ${
+              className={`group relative flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl border transition-all aspect-square focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer ${
                 isSelected
                   ? 'border-emerald-400 bg-emerald-950/90 shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400'
                   : 'border-emerald-950/80 hover:border-emerald-700/70 bg-[#06241a]/70 hover:bg-[#0a3a2b]'
               }`}
             >
               {/* Scaled thumbnail with transparent crisp display */}
-              <div className="w-10 h-10 flex items-center justify-center relative">
+              <div className="w-10 h-10 flex items-center justify-center relative pointer-events-none">
                 <img
                   src={item.imageUrl}
                   alt={item.name}
                   loading="lazy"
-                  className="max-w-full max-h-full object-contain drop-shadow transition-transform duration-150 group-hover:scale-110"
+                  className="max-w-full max-h-full object-contain drop-shadow transition-transform duration-150 group-hover:scale-110 pointer-events-none"
                 />
               </div>
 
               {/* Title label */}
-              <span className="text-[10px] text-emerald-300/80 group-hover:text-emerald-100 truncate w-full text-center mt-1 transition-colors">
+              <span className="text-[10px] text-emerald-300/80 group-hover:text-emerald-100 truncate w-full text-center mt-1 transition-colors pointer-events-none">
                 {item.name}
               </span>
 
@@ -83,7 +87,7 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
               {score !== undefined && score > 0.8 && (
                 <span
                   title="Semantic Match"
-                  className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-emerald-950"
+                  className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-emerald-950 pointer-events-none"
                 />
               )}
             </button>

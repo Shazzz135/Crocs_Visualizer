@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { VentHole } from '@crocs/shared';
+import { DEFAULT_CROC_COLORS, type VentHole } from '@crocs/shared';
 import { ShoeCanvas } from './components/canvas/ShoeCanvas.js';
 import { ShoeColorTab } from './components/controls/ShoeColorTab.js';
 import { JibbitzDiscoveryDrawer } from './components/discovery/JibbitzDiscoveryDrawer.js';
@@ -9,13 +9,14 @@ import { useMobileDrawerDrag } from './hooks/useMobileDrawerDrag.js';
 type CustomizerTab = 'shoe' | 'charms';
 
 export const App: React.FC = () => {
+  const customizer = useShoeCustomizer();
+  const size = customizer?.size ?? 'adult';
+  const color = customizer?.color ?? DEFAULT_CROC_COLORS[0];
+  const placements = customizer?.placements ?? [];
+  const occupiedHoleIds = customizer?.occupiedHoleIds ?? new Set<string>();
+  const activeCharmToPlace = customizer?.activeCharmToPlace ?? null;
+  const selectedPlacementId = customizer?.selectedPlacementId ?? null;
   const {
-    size,
-    color,
-    placements,
-    occupiedHoleIds,
-    activeCharmToPlace,
-    selectedPlacementId,
     setSize,
     setColor,
     setActiveHole,
@@ -24,7 +25,7 @@ export const App: React.FC = () => {
     placeCharm,
     updateRotation,
     handlePlacementClick,
-  } = useShoeCustomizer();
+  } = customizer ?? {};
 
   const [activeTab, setActiveTab] = useState<CustomizerTab>('charms');
   const {
@@ -38,9 +39,9 @@ export const App: React.FC = () => {
   } = useMobileDrawerDrag();
 
   const handleHoleClick = (hole: VentHole) => {
-    setActiveHole(hole);
+    setActiveHole?.(hole);
     if (activeCharmToPlace) {
-      placeCharm(activeCharmToPlace, hole.id);
+      placeCharm?.(activeCharmToPlace, hole.id);
     }
   };
 
@@ -166,7 +167,7 @@ export const App: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={() => setActiveCharmToPlace(null)}
+                onClick={() => setActiveCharmToPlace?.(null)}
                 className="text-[10px] text-emerald-400 hover:text-white px-1.5 py-0.5 rounded bg-emerald-900/80 cursor-pointer"
               >
                 Cancel
@@ -180,14 +181,14 @@ export const App: React.FC = () => {
               <ShoeColorTab
                 size={size}
                 color={color}
-                onSelectSize={setSize}
-                onSelectColor={setColor}
+                onSelectSize={(s) => setSize?.(s)}
+                onSelectColor={(c) => setColor?.(c)}
                 onNavigateToCharms={() => setActiveTab('charms')}
               />
             ) : (
               <JibbitzDiscoveryDrawer
                 selectedCharmId={activeCharmToPlace?.id}
-                onSelectCharm={(charm) => setActiveCharmToPlace(charm)}
+                onSelectCharm={(charm) => setActiveCharmToPlace?.(charm)}
               />
             )}
           </div>
@@ -205,9 +206,9 @@ export const App: React.FC = () => {
             occupiedHoleIds={occupiedHoleIds}
             selectedPlacementId={selectedPlacementId}
             onHoleClick={handleHoleClick}
-            onCharmClick={handlePlacementClick}
-            onRotateCharm={updateRotation}
-            onCanvasClick={() => setSelectedPlacementId(null)}
+            onCharmClick={(instId) => handlePlacementClick?.(instId)}
+            onRotateCharm={(instId, deg) => updateRotation?.(instId, deg)}
+            onCanvasClick={() => setSelectedPlacementId?.(null)}
           />
         </section>
       </main>

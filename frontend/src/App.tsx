@@ -26,6 +26,7 @@ export const AppContent: React.FC = () => {
     setSelectedPlacementId,
     placeCharm,
     moveCharm,
+    removePlacementByHole,
     updateRotation,
     handlePlacementClick,
     findFirstAvailableHole,
@@ -215,6 +216,7 @@ export const AppContent: React.FC = () => {
             onRotateCharm={(instId, deg) => updateRotation?.(instId, deg)}
             onCanvasClick={() => setSelectedPlacementId?.(null)}
             onDropCharm={handleDropCharm}
+            onRemoveCharm={(holeId) => removePlacementByHole?.(holeId)}
           />
         </section>
       </main>

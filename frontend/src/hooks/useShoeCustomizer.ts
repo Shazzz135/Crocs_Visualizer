@@ -29,6 +29,7 @@ export interface ShoeCustomizerState {
   moveCharm: (fromHoleId: HoleId, toHoleId: HoleId) => void;
   updateRotation: (instanceId: string, rotationDeg: number) => void;
   removePlacement: (instanceId: string) => void;
+  removePlacementByHole: (holeId: HoleId) => void;
   handlePlacementClick: (instanceId: string) => void;
   findFirstAvailableHole: () => HoleId | null;
   resetCustomizer: () => void;
@@ -104,6 +105,11 @@ export function useShoeCustomizer(): ShoeCustomizerState {
     setSelectedPlacementId((prev) => (prev === instanceId ? null : prev));
   }, []);
 
+  const removePlacementByHole = useCallback((holeId: HoleId) => {
+    setPlacements((prev) => prev.filter((p) => p.holeId !== holeId));
+    setSelectedPlacementId(null);
+  }, []);
+
   const handlePlacementClick = useCallback(
     (instanceId: string) => {
       const now = Date.now();
@@ -145,6 +151,7 @@ export function useShoeCustomizer(): ShoeCustomizerState {
     moveCharm,
     updateRotation,
     removePlacement,
+    removePlacementByHole,
     handlePlacementClick,
     findFirstAvailableHole,
     resetCustomizer,

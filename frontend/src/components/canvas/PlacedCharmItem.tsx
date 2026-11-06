@@ -20,7 +20,8 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
 }) => {
   const charm = placement.charm;
   const imageUrl = charm?.imageUrl ?? `/catalog/images/${placement.jibbitId}.png`;
-  const sizePx = 36;
+  // Doubled from 36px to 72px to match true proportions shown in reference/charm_ref.jpg
+  const sizePx = 72;
   const halfSize = sizePx / 2;
 
   const { dragState, startDrag } = useCharmDrag();
@@ -30,6 +31,8 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
     dragState.isDragging && dragState.sourceInstanceId === placement.instanceId;
 
   const handlePointerDown = (e: React.PointerEvent) => {
+    // Stop propagation so canvas zoom/pan doesn't move the screen when dragging charm
+    e.stopPropagation();
     if (e.button !== 0) return;
     const target = e.target as Element | null;
     if (target?.closest('[data-rotation-knob="true"]')) return;
@@ -76,6 +79,7 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
 
   return (
     <g
+      data-charm-item="true"
       className="pointer-events-auto select-none"
       transform={`translate(${position.x}, ${position.y})`}
       opacity={isBeingDragged ? 0.35 : 1}
@@ -87,7 +91,7 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
         className="cursor-grab active:cursor-grabbing transition-transform duration-75 active:scale-95 group"
       >
         {/* Invisible comfortable touch target */}
-        <circle r={halfSize + 4} fill="transparent" />
+        <circle r={halfSize + 6} fill="transparent" />
 
         {/* Charm Transparent PNG image */}
         <image
@@ -99,8 +103,8 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
           preserveAspectRatio="xMidYMid meet"
           style={{
             filter: isSelected
-              ? 'drop-shadow(0 0 6px rgba(16, 185, 129, 0.8)) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.6))'
-              : 'drop-shadow(0 6px 8px rgba(0, 0, 0, 0.5))',
+              ? 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.9)) drop-shadow(0 8px 14px rgba(0, 0, 0, 0.6))'
+              : 'drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5))',
           }}
           className="transition-all duration-150 group-hover:scale-105 pointer-events-none"
         />
@@ -111,7 +115,7 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
         <RotationDial
           center={{ x: 0, y: 0 }}
           rotationDeg={placement.rotationDeg}
-          radius={halfSize + 6}
+          radius={halfSize + 8}
           onRotate={(deg) => onRotate(placement.instanceId, deg)}
         />
       )}

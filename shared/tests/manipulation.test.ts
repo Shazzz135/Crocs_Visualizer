@@ -32,8 +32,8 @@ describe('Rotation Utilities', () => {
   });
 });
 
-describe('Deliberate 3-Click Deletion Engine', () => {
-  it('selects on first click', () => {
+describe('Double-Tap Deletion Engine', () => {
+  it('selects on first tap', () => {
     const state: ClickTrackerState = { targetId: null, clickCount: 0, lastClickTime: 0 };
     const res = processCharmClick('inst-1', state, 1000);
 
@@ -43,26 +43,17 @@ describe('Deliberate 3-Click Deletion Engine', () => {
     expect(res.nextState.targetId).toBe('inst-1');
   });
 
-  it('records second click without deleting', () => {
+  it('deletes on the second tap (double-tap within timeout)', () => {
     const state: ClickTrackerState = { targetId: 'inst-1', clickCount: 1, lastClickTime: 1000 };
-    const res = processCharmClick('inst-1', state, 1200);
-
-    expect(res.isSelected).toBe(true);
-    expect(res.shouldDelete).toBe(false);
-    expect(res.nextState.clickCount).toBe(2);
-  });
-
-  it('deletes exactly on the third click (select + double-tap)', () => {
-    const state: ClickTrackerState = { targetId: 'inst-1', clickCount: 2, lastClickTime: 1200 };
-    const res = processCharmClick('inst-1', state, 1350);
+    const res = processCharmClick('inst-1', state, 1250);
 
     expect(res.shouldDelete).toBe(true);
     expect(res.isSelected).toBe(false);
     expect(res.nextState.clickCount).toBe(0);
   });
 
-  it('resets click count if time between clicks exceeds timeout', () => {
-    const state: ClickTrackerState = { targetId: 'inst-1', clickCount: 2, lastClickTime: 1000 };
+  it('resets click count if time between taps exceeds timeout', () => {
+    const state: ClickTrackerState = { targetId: 'inst-1', clickCount: 1, lastClickTime: 1000 };
     // Click after timeout expired
     const res = processCharmClick('inst-1', state, 1000 + DEFAULT_CLICK_TIMEOUT_MS + 100);
 
@@ -72,7 +63,7 @@ describe('Deliberate 3-Click Deletion Engine', () => {
   });
 
   it('switches target if clicking another charm', () => {
-    const state: ClickTrackerState = { targetId: 'inst-1', clickCount: 2, lastClickTime: 1000 };
+    const state: ClickTrackerState = { targetId: 'inst-1', clickCount: 1, lastClickTime: 1000 };
     const res = processCharmClick('inst-2', state, 1100);
 
     expect(res.shouldDelete).toBe(false);

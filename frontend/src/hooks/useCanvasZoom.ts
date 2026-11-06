@@ -33,24 +33,15 @@ export interface CanvasZoomState {
   handleTouchEnd: () => void;
 }
 
-function getTouchDistance(touches: React.TouchList): number {
-  return Math.hypot(
-    touches[0].clientX - touches[1].clientX,
-    touches[0].clientY - touches[1].clientY
-  );
-}
+const getTouchDistance = (t: React.TouchList): number =>
+  Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
 
-function getTouchMidpoint(touches: React.TouchList): PanOffset {
-  return {
-    x: (touches[0].clientX + touches[1].clientX) / 2,
-    y: (touches[0].clientY + touches[1].clientY) / 2,
-  };
-}
+const getTouchMidpoint = (t: React.TouchList): PanOffset => ({
+  x: (t[0].clientX + t[1].clientX) / 2,
+  y: (t[0].clientY + t[1].clientY) / 2,
+});
 
-export function useCanvasZoom({
-  pairWidth,
-  pairHeight,
-}: UseCanvasZoomOptions): CanvasZoomState {
+export function useCanvasZoom({ pairWidth, pairHeight }: UseCanvasZoomOptions): CanvasZoomState {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [zoom, setZoom] = useState<number>(1);
   const [pan, setPan] = useState<PanOffset>({ x: 0, y: 0 });
@@ -84,7 +75,6 @@ export function useCanvasZoom({
     []
   );
 
-  // Measure container and compute responsive fitScale so mobile always fits seamlessly
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -104,7 +94,6 @@ export function useCanvasZoom({
     return () => observer.disconnect();
   }, [pairWidth, pairHeight]);
 
-  // Windows / Desktop scroll wheel zoom anchored at cursor position
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -132,11 +121,18 @@ export function useCanvasZoom({
     return () => el.removeEventListener('wheel', onWheel);
   }, [clampZoom]);
 
-  // Click-and-drag pan anywhere on the canvas (ignoring only the Zoom HUD buttons)
+  // Click-and-drag pan (ignoring HUD buttons, charms, and hole sockets)
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     const target = e.target as Element | null;
-    if (target?.closest('[data-zoom-hud="true"]')) return;
+    if (
+      target?.closest('[data-zoom-hud="true"]') ||
+      target?.closest('[data-charm-item="true"]') ||
+      target?.closest('[data-hole-socket="true"]') ||
+      target?.closest('[data-rotation-knob="true"]')
+    ) {
+      return;
+    }
 
     dragStartRef.current = {
       pointerId: e.pointerId,
@@ -173,7 +169,6 @@ export function useCanvasZoom({
     }
   }, []);
 
-  // Mobile 2-finger pinch-to-zoom anchored at pinch midpoint
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     if (e.touches.length === 2) {
       dragStartRef.current = null;

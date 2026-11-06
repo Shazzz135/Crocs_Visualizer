@@ -18,6 +18,7 @@ interface ShoeCanvasProps {
   onRotateCharm?: (instanceId: string, deg: number) => void;
   onCanvasClick?: () => void;
   onDropCharm?: (charm: JibbitzItem, holeId: HoleId, sourceHoleId?: HoleId | null) => void;
+  onRemoveCharm?: (sourceHoleId: HoleId) => void;
 }
 
 export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
@@ -32,6 +33,7 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
   onRotateCharm,
   onCanvasClick,
   onDropCharm,
+  onRemoveCharm,
 }) => {
   const displaySpec = SHOE_DISPLAY_SIZES[size] ?? SHOE_DISPLAY_SIZES.adult;
   const gapPx = size === 'infant' ? 4 : 6;
@@ -94,10 +96,15 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
     };
 
     const handleWindowPointerUp = (e: PointerEvent) => {
+      const sourceHole = dragState.sourceHoleId;
       const finalHoleId = resolveNearestHole(e.clientX, e.clientY);
       const dropped = endDrag(finalHoleId);
+
       if (dropped && onDropCharm) {
         onDropCharm(dropped.charm, dropped.holeId, dropped.sourceHoleId);
+      } else if (!finalHoleId && sourceHole && onRemoveCharm) {
+        // Dragged off shoe and dropped in empty canvas -> remove from shoe
+        onRemoveCharm(sourceHole);
       }
     };
 
@@ -110,7 +117,7 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
       window.removeEventListener('pointerup', handleWindowPointerUp);
       window.removeEventListener('pointercancel', handleWindowPointerUp);
     };
-  }, [dragState.isDragging, dragState.sourceHoleId, endDrag, occupiedHoleIds, onDropCharm, size, updateDragPosition]);
+  }, [dragState.isDragging, dragState.sourceHoleId, endDrag, occupiedHoleIds, onDropCharm, onRemoveCharm, size, updateDragPosition]);
 
   const handleContainerClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).tagName === 'DIV' || (e.target as HTMLElement).tagName === 'svg') {

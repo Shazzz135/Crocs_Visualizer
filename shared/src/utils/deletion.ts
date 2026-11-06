@@ -4,12 +4,12 @@ export interface ClickTrackerState {
   lastClickTime: number;
 }
 
-export const DEFAULT_CLICK_TIMEOUT_MS = 600;
+export const DEFAULT_CLICK_TIMEOUT_MS = 500;
 
 /**
- * Handles deliberate 3-click deletion tracking:
- * Click 1: Select charm
- * Click 2 + 3 (double-click while selected): Trigger deletion
+ * Handles double-tap deletion tracking:
+ * Tap 1: Select charm
+ * Tap 2 (double-tap within timeout): Trigger deletion
  * Returns: { shouldDelete: boolean, isSelected: boolean, nextState: ClickTrackerState }
  */
 export function processCharmClick(
@@ -27,19 +27,14 @@ export function processCharmClick(
 
   if (isSameTarget && isWithinTimeout) {
     const nextCount = currentState.clickCount + 1;
-    if (nextCount >= 3) {
-      // Exactly 3 total clicks reached (select + double-tap) -> Trigger deletion
+    if (nextCount >= 2) {
+      // Double-tap reached -> Trigger deletion
       return {
         shouldDelete: true,
         isSelected: false,
         nextState: { targetId: null, clickCount: 0, lastClickTime: 0 },
       };
     }
-    return {
-      shouldDelete: false,
-      isSelected: true,
-      nextState: { targetId: charmId, clickCount: nextCount, lastClickTime: now },
-    };
   }
 
   // First click on this charm (or previous click timed out)

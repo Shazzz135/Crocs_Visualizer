@@ -118,8 +118,8 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           style={{
             left: `${dragState.pointerPos.x}px`,
             top: `${dragState.pointerPos.y}px`,
-            width: '44px',
-            height: '44px',
+            width: '72px',
+            height: '72px',
           }}
         >
           <img

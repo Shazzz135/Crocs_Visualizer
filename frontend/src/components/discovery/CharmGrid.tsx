@@ -93,6 +93,8 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
               key={item.id}
               role="button"
               tabIndex={0}
+              data-testid="charm-card"
+              data-charm-id={item.id}
               style={{ touchAction: 'none' }}
               onPointerDown={(e) => handlePointerDown(item, e)}
               title={`${item.name} (${item.category}) - Drag onto shoe or click to place`}

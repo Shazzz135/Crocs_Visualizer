@@ -10,6 +10,7 @@ interface VentHoleSocketProps {
   radius?: number;
   wallColor?: string;
   highlightColor?: string;
+  scaleCorrection?: { sx: number; sy: number };
   onSelect?: (hole: VentHole) => void;
 }
 
@@ -22,12 +23,16 @@ export const VentHoleSocket: React.FC<VentHoleSocketProps> = ({
   radius = 11,
   wallColor = '#141820',
   highlightColor = 'rgba(255, 255, 255, 0.25)',
+  scaleCorrection = { sx: 1, sy: 1 },
   onSelect,
 }) => {
   return (
     <g
+      data-testid="hole-socket"
+      data-hole-id={hole.id}
+      data-occupied={isOccupied}
       className="cursor-pointer transition-transform duration-150"
-      transform={`translate(${position.x}, ${position.y})`}
+      transform={`translate(${position.x}, ${position.y}) scale(${scaleCorrection.sx}, ${scaleCorrection.sy})`}
       onClick={(e) => {
         e.stopPropagation();
         onSelect?.(hole);
@@ -68,15 +73,9 @@ export const VentHoleSocket: React.FC<VentHoleSocketProps> = ({
       {/* Deep recessed interior hole cavity */}
       <circle
         cx={0.3}
-        cy={0.9}
-        r={Math.max(2, radius - 0.9)}
-        fill="#0d1017"
-      />
-
-      {/* Top inner wall cast shadow crescent */}
-      <path
-        d={`M ${-radius * 0.78} ${-radius * 0.15} A ${radius * 0.82} ${radius * 0.82} 0 0 1 ${radius * 0.78} ${-radius * 0.15} A ${radius * 0.85} ${radius * 0.58} 0 0 0 ${-radius * 0.78} ${-radius * 0.15} Z`}
-        fill="rgba(0, 0, 0, 0.55)"
+        cy={0.4}
+        r={radius - 0.2}
+        fill="#020806"
       />
     </g>
   );

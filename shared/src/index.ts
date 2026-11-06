@@ -4,6 +4,7 @@ export * from './types/jibbitz.js';
 
 // Layout & hole constants
 export * from './constants/holes.js';
+export * from './constants/disclaimers.js';
 
 // Sizing & coordinate formulas
 export * from './utils/sizing.js';

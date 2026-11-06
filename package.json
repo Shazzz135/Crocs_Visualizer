@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "pnpm --filter @crocs/shared test",
+    "test:e2e": "pnpm --filter frontend test:e2e",
     "lint": "pnpm --filter frontend lint",
     "build": "pnpm --filter frontend build",
     "audit:lines": "node scripts/check-file-length.mjs"

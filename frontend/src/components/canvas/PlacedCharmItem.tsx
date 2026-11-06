@@ -7,6 +7,7 @@ interface PlacedCharmItemProps {
   placement: PlacedJibbitz;
   position: Point2D;
   isSelected: boolean;
+  scaleCorrection?: { sx: number; sy: number };
   onClick: (instanceId: string) => void;
   onRotate: (instanceId: string, deg: number) => void;
 }
@@ -15,6 +16,7 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
   placement,
   position,
   isSelected,
+  scaleCorrection = { sx: 1, sy: 1 },
   onClick,
   onRotate,
 }) => {
@@ -92,8 +94,11 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
   return (
     <g
       data-charm-item="true"
+      data-testid="placed-charm"
+      data-instance-id={placement.instanceId}
+      data-hole-id={placement.holeId}
       className="pointer-events-auto select-none"
-      transform={`translate(${position.x}, ${position.y})`}
+      transform={`translate(${position.x}, ${position.y}) scale(${scaleCorrection.sx}, ${scaleCorrection.sy})`}
       opacity={isBeingDragged ? 0.35 : 1}
     >
       {/* Placed Charm Image Group (touch-action none prevents mobile screen scroll) */}

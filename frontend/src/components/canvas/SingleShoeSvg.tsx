@@ -46,6 +46,15 @@ export const SingleShoeSvg = forwardRef<SVGSVGElement, SingleShoeSvgProps>(
     const sizeHoles = SHOE_HOLES_BY_SIZE[size] ?? SHOE_HOLES_BY_SIZE.adult;
     const prefix = isLeft ? 'HL' : 'HR';
 
+    // Counter-scale so charms and holes maintain exact Adult visual size and 1:1 roundness
+    const scaleCorrection = useMemo(
+      () => ({
+        sx: 210 / width,
+        sy: 472 / height,
+      }),
+      [width, height]
+    );
+
     const placementsByHole = useMemo(() => {
       const map = new Map<string, PlacedJibbitz>();
       for (const p of placements) {
@@ -57,8 +66,10 @@ export const SingleShoeSvg = forwardRef<SVGSVGElement, SingleShoeSvgProps>(
     return (
       <svg
         ref={ref}
+        data-shoe-side={side}
+        data-testid={`${side}-shoe-svg`}
         viewBox={`0 0 ${SHOE_VIEWBOX.width} ${SHOE_VIEWBOX.height}`}
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="none"
         style={{
           width: `${width}px`,
           height: `${height}px`,
@@ -71,7 +82,7 @@ export const SingleShoeSvg = forwardRef<SVGSVGElement, SingleShoeSvgProps>(
       >
         <ShoeSvgDefs side={side} palette={palette} />
 
-        {/* Shoe Geometry Group (Right shoe is mirrored horizontally) */}
+        {/* Shoe Geometry Group (Height compresses for smaller sizes) */}
         <g
           className="pointer-events-auto"
           transform={
@@ -116,6 +127,7 @@ export const SingleShoeSvg = forwardRef<SVGSVGElement, SingleShoeSvgProps>(
                   radius={h.r}
                   wallColor={palette.seamColor}
                   highlightColor={palette.highlightBright}
+                  scaleCorrection={scaleCorrection}
                   isOccupied={occupiedHoleIds.has(id)}
                   isSnapTarget={activeSnapHoleId === id}
                   onSelect={onHoleClick}
@@ -126,6 +138,7 @@ export const SingleShoeSvg = forwardRef<SVGSVGElement, SingleShoeSvgProps>(
                   <PlacedCharmItem
                     placement={placement}
                     position={{ x, y: h.y }}
+                    scaleCorrection={scaleCorrection}
                     isSelected={selectedPlacementId === placement.instanceId}
                     onClick={(instId) => onCharmClick?.(instId)}
                     onRotate={(instId, deg) => onRotateCharm?.(instId, deg)}

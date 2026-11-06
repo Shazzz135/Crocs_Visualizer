@@ -8,6 +8,11 @@ dist-ssr/
 build/
 *.tsbuildinfo
 
+# Test artifacts
+test-results/
+playwright-report/
+coverage/
+
 # Python / Data Pipeline
 __pycache__/
 *.py[cod]

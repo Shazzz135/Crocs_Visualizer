@@ -1,4 +1,4 @@
-import type { CrocColor, CrocSize, VentHole } from '@crocs/shared';
+import type { CrocColor, CrocSize, PlacedJibbitz, VentHole } from '@crocs/shared';
 import React from 'react';
 import { useCanvasZoom } from '../../hooks/useCanvasZoom.js';
 import { SHOE_DISPLAY_SIZES } from './shoeHoleConfig.js';
@@ -7,17 +7,27 @@ import { SingleShoeSvg } from './SingleShoeSvg.js';
 interface ShoeCanvasProps {
   size: CrocSize;
   color: CrocColor;
+  placements?: PlacedJibbitz[];
   occupiedHoleIds?: Set<string>;
   activeSnapHoleId?: string | null;
+  selectedPlacementId?: string | null;
   onHoleClick?: (hole: VentHole) => void;
+  onCharmClick?: (instanceId: string) => void;
+  onRotateCharm?: (instanceId: string, deg: number) => void;
+  onCanvasClick?: () => void;
 }
 
 export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
   size,
   color,
+  placements = [],
   occupiedHoleIds = new Set(),
   activeSnapHoleId = null,
+  selectedPlacementId = null,
   onHoleClick,
+  onCharmClick,
+  onRotateCharm,
+  onCanvasClick,
 }) => {
   const displaySpec = SHOE_DISPLAY_SIZES[size] ?? SHOE_DISPLAY_SIZES.adult;
   const gapPx = size === 'infant' ? 4 : 6;
@@ -40,9 +50,17 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
     handleTouchEnd,
   } = useCanvasZoom({ pairWidth, pairHeight });
 
+  const handleContainerClick = (e: React.MouseEvent) => {
+    // Only deselect if clicking canvas background, not on interactive shoe parts
+    if ((e.target as HTMLElement).tagName === 'DIV' || (e.target as HTMLElement).tagName === 'svg') {
+      onCanvasClick?.();
+    }
+  };
+
   return (
     <div
       ref={containerRef}
+      onClick={handleContainerClick}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -107,9 +125,13 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
           colorHex={color.hex}
           width={displaySpec.width}
           height={displaySpec.height}
+          placements={placements}
           occupiedHoleIds={occupiedHoleIds}
           activeSnapHoleId={activeSnapHoleId}
+          selectedPlacementId={selectedPlacementId}
           onHoleClick={onHoleClick}
+          onCharmClick={onCharmClick}
+          onRotateCharm={onRotateCharm}
         />
 
         {/* Right Shoe (Mirrored Left Shoe) */}
@@ -119,9 +141,13 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
           colorHex={color.hex}
           width={displaySpec.width}
           height={displaySpec.height}
+          placements={placements}
           occupiedHoleIds={occupiedHoleIds}
           activeSnapHoleId={activeSnapHoleId}
+          selectedPlacementId={selectedPlacementId}
           onHoleClick={onHoleClick}
+          onCharmClick={onCharmClick}
+          onRotateCharm={onRotateCharm}
         />
       </div>
     </div>

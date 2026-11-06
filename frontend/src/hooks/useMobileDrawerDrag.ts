@@ -6,6 +6,8 @@ interface UseMobileDrawerDragReturn {
   position: DrawerPosition;
   dragHeightPx: number | null;
   isDragging: boolean;
+  drawerStyle: React.CSSProperties;
+  drawerClass: string;
   handleTouchStart: (e: React.TouchEvent | React.PointerEvent) => void;
   handleTouchMove: (e: React.TouchEvent | React.PointerEvent) => void;
   handleTouchEnd: () => void;
@@ -26,14 +28,9 @@ export function useMobileDrawerDrag(): UseMobileDrawerDragReturn {
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
       startYRef.current = clientY;
 
-      // Determine current height in px
       const vh = window.innerHeight;
       const curH =
-        position === 'expanded'
-          ? vh * 0.92
-          : position === 'mid'
-          ? vh * 0.55
-          : 64;
+        position === 'expanded' ? vh * 0.92 : position === 'mid' ? vh * 0.55 : 64;
 
       startHeightRef.current = curH;
       setIsDragging(true);
@@ -45,8 +42,11 @@ export function useMobileDrawerDrag(): UseMobileDrawerDragReturn {
     (e: React.TouchEvent | React.PointerEvent) => {
       if (!isDragging) return;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      const deltaY = startYRef.current - clientY; // upward drag is positive
-      const newHeight = Math.max(64, Math.min(window.innerHeight * 0.94, startHeightRef.current + deltaY));
+      const deltaY = startYRef.current - clientY;
+      const newHeight = Math.max(
+        64,
+        Math.min(window.innerHeight * 0.94, startHeightRef.current + deltaY)
+      );
       setDragHeightPx(newHeight);
     },
     [isDragging]
@@ -80,10 +80,24 @@ export function useMobileDrawerDrag(): UseMobileDrawerDragReturn {
     });
   }, []);
 
+  const drawerStyle: React.CSSProperties =
+    dragHeightPx !== null ? { height: `${dragHeightPx}px`, transition: 'none' } : {};
+
+  const drawerClass =
+    dragHeightPx !== null
+      ? 'fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
+      : position === 'expanded'
+      ? 'h-[92dvh] fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
+      : position === 'collapsed'
+      ? 'h-16 fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
+      : 'h-[56dvh] md:h-full';
+
   return {
     position,
     dragHeightPx,
     isDragging,
+    drawerStyle,
+    drawerClass,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,

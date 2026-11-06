@@ -4,7 +4,6 @@ import { searchJibbitz } from '@crocs/shared';
 import { SearchBar } from './SearchBar.js';
 import { CategoryFilterDropdown } from './CategoryFilterDropdown.js';
 import { CharmGrid } from './CharmGrid.js';
-import { CharmDetailCard } from './CharmDetailCard.js';
 
 interface CatalogResponse {
   version: string;
@@ -100,14 +99,6 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
           categoryCounts={categoryCounts}
         />
       </div>
-
-      {/* Selected Charm Detail Card (if one is chosen) */}
-      {activeCharm && (
-        <CharmDetailCard
-          charm={activeCharm}
-          onClose={() => setActiveCharm(null)}
-        />
-      )}
 
       {/* Charms Grid with All Charms Always Loaded & Maximum Scroll Height */}
       <CharmGrid

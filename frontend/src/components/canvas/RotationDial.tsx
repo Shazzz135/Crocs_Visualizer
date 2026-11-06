@@ -15,7 +15,7 @@ export const RotationDial: React.FC<RotationDialProps> = ({
   onRotate,
 }) => {
   const [isRotating, setIsRotating] = useState(false);
-  const dragStartRef = useRef<{ startX: number; startAngle: number } | null>(null);
+  const dragStartRef = useRef<{ startY: number; startAngle: number } | null>(null);
 
   // Knob position at rotationDeg angle (0 deg is 12 o'clock)
   const angleRad = (rotationDeg * Math.PI) / 180;
@@ -30,7 +30,7 @@ export const RotationDial: React.FC<RotationDialProps> = ({
       } catch {
         // pointer capture fallback
       }
-      dragStartRef.current = { startX: e.clientX, startAngle: rotationDeg };
+      dragStartRef.current = { startY: e.clientY, startAngle: rotationDeg };
       setIsRotating(true);
     },
     [rotationDeg]
@@ -42,10 +42,11 @@ export const RotationDial: React.FC<RotationDialProps> = ({
       if (!isRotating || !drag) return;
       e.stopPropagation();
 
-      // Smooth linear movement: dragging left/right linearly changes rotation angle
-      const dx = e.clientX - drag.startX;
-      const sensitivity = 0.95;
-      const rawAngle = drag.startAngle + Math.round(dx * sensitivity);
+      // Smooth linear movement: dragging vertically (up/down) linearly changes rotation angle
+      // Dragging UP rotates clockwise (+deg), dragging DOWN rotates counter-clockwise (-deg)
+      const dy = drag.startY - e.clientY;
+      const sensitivity = 1.0;
+      const rawAngle = drag.startAngle + Math.round(dy * sensitivity);
       const normalizedAngle = ((rawAngle % 360) + 360) % 360;
 
       onRotate(normalizedAngle);
@@ -93,7 +94,7 @@ export const RotationDial: React.FC<RotationDialProps> = ({
         className="pointer-events-none"
       />
 
-      {/* Prominent Linear Rotate Point (Optimized for Mobile Touch) */}
+      {/* Prominent Linear Rotate Point (Drag vertically up/down to rotate) */}
       <g
         data-rotation-knob="true"
         transform={`translate(${knobX}, ${knobY})`}
@@ -101,7 +102,7 @@ export const RotationDial: React.FC<RotationDialProps> = ({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        className="cursor-ew-resize active:cursor-ew-resize transition-transform hover:scale-110 active:scale-125"
+        className="cursor-ns-resize active:cursor-ns-resize transition-transform hover:scale-110 active:scale-125"
       >
         {/* Large invisible hit area (r=24 / 48px touch diameter for mobile) */}
         <circle r={24} fill="transparent" pointerEvents="all" />
@@ -115,27 +116,18 @@ export const RotationDial: React.FC<RotationDialProps> = ({
           className="shadow-lg filter drop-shadow(0 0 6px rgba(16,185,129,0.75))"
         />
 
-        {/* Inner Solid Rotate Dot */}
+        {/* Inner Solid Center Dot */}
         <circle r={4.5} fill="#34d399" />
 
-        {/* Mini circular rotation arrows icon */}
+        {/* Clean vertical arrows icon indicating vertical linear rotation */}
         <path
-          d="M -6 -1 A 6 6 0 0 1 5 -3 M 5 -3 L 3 -6 M 5 -3 L 2 -1"
+          d="M 0 -6 L -3.5 -2.5 M 0 -6 L 3.5 -2.5 M 0 -6 L 0 6 M 0 6 L -3.5 2.5 M 0 6 L 3.5 2.5"
           fill="none"
           stroke="#a7f3d0"
-          strokeWidth="1.2"
+          strokeWidth="1.3"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="pointer-events-none opacity-80"
-        />
-        <path
-          d="M 6 1 A 6 6 0 0 1 -5 3 M -5 3 L -3 6 M -5 3 L -2 1"
-          fill="none"
-          stroke="#a7f3d0"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="pointer-events-none opacity-80"
+          className="pointer-events-none opacity-90"
         />
       </g>
 

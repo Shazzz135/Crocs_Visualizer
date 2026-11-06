@@ -94,7 +94,7 @@ export const RotationDial: React.FC<RotationDialProps> = ({
         className="pointer-events-none"
       />
 
-      {/* Prominent Linear Rotate Point (Drag vertically up/down to rotate) */}
+      {/* Prominent Linear Rotate Point (Enlarged for Windows & Mobile) */}
       <g
         data-rotation-knob="true"
         transform={`translate(${knobX}, ${knobY})`}
@@ -102,38 +102,38 @@ export const RotationDial: React.FC<RotationDialProps> = ({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        className="cursor-ns-resize active:cursor-ns-resize transition-transform hover:scale-110 active:scale-125"
+        className="cursor-ns-resize active:cursor-ns-resize transition-transform hover:scale-115 active:scale-125"
       >
-        {/* Large invisible hit area (r=24 / 48px touch diameter for mobile) */}
-        <circle r={24} fill="transparent" pointerEvents="all" />
+        {/* Large invisible hit area (r=28 / 56px touch diameter for mobile & easy click on Windows) */}
+        <circle r={28} fill="transparent" pointerEvents="all" />
 
-        {/* Outer Emerald Glow Ring */}
+        {/* Outer Emerald Glow Ring (Enlarged r=15 for easy grabbing on Windows) */}
         <circle
-          r={12}
+          r={15}
           fill="#06241a"
           stroke="#10b981"
-          strokeWidth="2.5"
-          className="shadow-lg filter drop-shadow(0 0 6px rgba(16,185,129,0.75))"
+          strokeWidth="2.8"
+          className="shadow-xl filter drop-shadow(0 0 8px rgba(16,185,129,0.85))"
         />
 
         {/* Inner Solid Center Dot */}
-        <circle r={4.5} fill="#34d399" />
+        <circle r={5.5} fill="#34d399" />
 
-        {/* Clean vertical arrows icon indicating vertical linear rotation */}
+        {/* Bold vertical arrows icon indicating vertical linear rotation */}
         <path
-          d="M 0 -6 L -3.5 -2.5 M 0 -6 L 3.5 -2.5 M 0 -6 L 0 6 M 0 6 L -3.5 2.5 M 0 6 L 3.5 2.5"
+          d="M 0 -8 L -4 -4 M 0 -8 L 4 -4 M 0 -8 L 0 8 M 0 8 L -4 4 M 0 8 L 4 4"
           fill="none"
           stroke="#a7f3d0"
-          strokeWidth="1.3"
+          strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="pointer-events-none opacity-90"
+          className="pointer-events-none opacity-95"
         />
       </g>
 
       {/* Live Degree Badge Readout while rotating */}
       {isRotating && (
-        <g transform={`translate(${center.x}, ${center.y - radius - 18})`}>
+        <g transform={`translate(${center.x}, ${center.y - radius - 20})`}>
           <rect
             x={-18}
             y={-10}

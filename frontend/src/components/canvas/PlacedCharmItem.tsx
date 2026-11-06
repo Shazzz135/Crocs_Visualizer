@@ -35,6 +35,14 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
     const target = e.target as Element | null;
     if (target?.closest('[data-rotation-knob="true"]')) return;
 
+    const targetEl = e.currentTarget as Element;
+    const pointerId = e.pointerId;
+    try {
+      targetEl.setPointerCapture(pointerId);
+    } catch {
+      // fallback
+    }
+
     pointerStartRef.current = { x: e.clientX, y: e.clientY, moved: false };
 
     const handlePointerMove = (moveEvt: PointerEvent) => {
@@ -45,7 +53,6 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
       if (Math.hypot(dx, dy) > 5 && !pointerStartRef.current.moved) {
         pointerStartRef.current.moved = true;
         if (charm) {
-          // Pass placement.rotationDeg so it holds its exact rotation in the air
           startDrag(
             charm,
             { x: moveEvt.clientX, y: moveEvt.clientY },
@@ -66,6 +73,11 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
     };
 
     const cleanup = () => {
+      try {
+        targetEl.releasePointerCapture(pointerId);
+      } catch {
+        // no-op
+      }
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
       window.removeEventListener('pointercancel', handlePointerUp);
@@ -84,8 +96,9 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
       transform={`translate(${position.x}, ${position.y})`}
       opacity={isBeingDragged ? 0.35 : 1}
     >
-      {/* Placed Charm Image Group (with Rotation applied) */}
+      {/* Placed Charm Image Group (touch-action none prevents mobile screen scroll) */}
       <g
+        style={{ touchAction: 'none' }}
         transform={`rotate(${placement.rotationDeg})`}
         onPointerDown={handlePointerDown}
         className="cursor-grab active:cursor-grabbing transition-transform duration-75 active:scale-95 group"
@@ -110,7 +123,7 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
         />
       </g>
 
-      {/* Rotation Dial Halo with large mobile-friendly rotate point */}
+      {/* Rotation Dial Halo with prominent vertical linear rotate point */}
       {isSelected && !isBeingDragged && (
         <RotationDial
           center={{ x: 0, y: 0 }}

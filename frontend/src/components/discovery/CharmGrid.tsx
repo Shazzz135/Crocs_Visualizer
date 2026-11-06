@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
-import type { JibbitzItem } from '@crocs/shared';
-import type { ScoredJibbitzItem } from '@crocs/shared';
+import type { JibbitzItem, ScoredJibbitzItem } from '@crocs/shared';
 import { useCharmDrag } from '../../context/useCharmDrag.js';
 
 interface CharmGridProps {
@@ -18,8 +17,15 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
   const pointerStartRef = useRef<{ x: number; y: number; item: JibbitzItem; moved: boolean } | null>(null);
 
   const handlePointerDown = (item: JibbitzItem, e: React.PointerEvent) => {
-    // Only respond to main button
     if (e.button !== 0) return;
+    const targetEl = e.currentTarget as Element;
+    const pointerId = e.pointerId;
+    try {
+      targetEl.setPointerCapture(pointerId);
+    } catch {
+      // fallback
+    }
+
     pointerStartRef.current = { x: e.clientX, y: e.clientY, item, moved: false };
 
     const handlePointerMove = (moveEvt: PointerEvent) => {
@@ -43,6 +49,11 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
     };
 
     const cleanup = () => {
+      try {
+        targetEl.releasePointerCapture(pointerId);
+      } catch {
+        // no-op
+      }
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
       window.removeEventListener('pointercancel', handlePointerUp);
@@ -82,6 +93,7 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
               key={item.id}
               role="button"
               tabIndex={0}
+              style={{ touchAction: 'none' }}
               onPointerDown={(e) => handlePointerDown(item, e)}
               title={`${item.name} (${item.category}) - Drag onto shoe or click to place`}
               className={`group relative flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl border transition-all aspect-square focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-grab active:cursor-grabbing select-none ${

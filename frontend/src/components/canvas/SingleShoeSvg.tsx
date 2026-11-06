@@ -1,5 +1,5 @@
 import type { CrocSize, HoleId, PlacedJibbitz, VentHole } from '@crocs/shared';
-import React, { useMemo } from 'react';
+import { useMemo, forwardRef } from 'react';
 import { FOOTBED_NUBS_PATH } from './crocsNubsData.js';
 import { CLOG_REGIONS, SHOE_VIEWBOX } from './crocsSvgData.js';
 import { computeShoePalette } from './shoeColorUtils.js';
@@ -23,113 +23,121 @@ interface SingleShoeSvgProps {
   onRotateCharm?: (instanceId: string, deg: number) => void;
 }
 
-export const SingleShoeSvg: React.FC<SingleShoeSvgProps> = ({
-  side,
-  size,
-  colorHex,
-  width,
-  height,
-  placements = [],
-  occupiedHoleIds = new Set(),
-  activeSnapHoleId = null,
-  selectedPlacementId = null,
-  onHoleClick,
-  onCharmClick,
-  onRotateCharm,
-}) => {
-  const isLeft = side === 'left';
-  const palette = useMemo(() => computeShoePalette(colorHex), [colorHex]);
-  const sizeHoles = SHOE_HOLES_BY_SIZE[size] ?? SHOE_HOLES_BY_SIZE.adult;
-  const prefix = isLeft ? 'HL' : 'HR';
+export const SingleShoeSvg = forwardRef<SVGSVGElement, SingleShoeSvgProps>(
+  (
+    {
+      side,
+      size,
+      colorHex,
+      width,
+      height,
+      placements = [],
+      occupiedHoleIds = new Set(),
+      activeSnapHoleId = null,
+      selectedPlacementId = null,
+      onHoleClick,
+      onCharmClick,
+      onRotateCharm,
+    },
+    ref
+  ) => {
+    const isLeft = side === 'left';
+    const palette = useMemo(() => computeShoePalette(colorHex), [colorHex]);
+    const sizeHoles = SHOE_HOLES_BY_SIZE[size] ?? SHOE_HOLES_BY_SIZE.adult;
+    const prefix = isLeft ? 'HL' : 'HR';
 
-  const placementsByHole = useMemo(() => {
-    const map = new Map<string, PlacedJibbitz>();
-    for (const p of placements) {
-      map.set(p.holeId, p);
-    }
-    return map;
-  }, [placements]);
+    const placementsByHole = useMemo(() => {
+      const map = new Map<string, PlacedJibbitz>();
+      for (const p of placements) {
+        map.set(p.holeId, p);
+      }
+      return map;
+    }, [placements]);
 
-  return (
-    <svg
-      viewBox={`0 0 ${SHOE_VIEWBOX.width} ${SHOE_VIEWBOX.height}`}
-      preserveAspectRatio="none"
-      style={{
-        width: `${width}px`,
-        height: `${height}px`,
-        background: 'transparent',
-        pointerEvents: 'none',
-        filter: 'drop-shadow(0 14px 18px rgba(0, 0, 0, 0.48))',
-      }}
-      className="transition-all duration-300 overflow-visible block"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <ShoeSvgDefs side={side} palette={palette} />
-
-      {/* Shoe Geometry Group (Right shoe is mirrored horizontally) */}
-      <g
-        className="pointer-events-auto"
-        transform={
-          isLeft ? undefined : `translate(${SHOE_VIEWBOX.width}, 0) scale(-1, 1)`
-        }
+    return (
+      <svg
+        ref={ref}
+        viewBox={`0 0 ${SHOE_VIEWBOX.width} ${SHOE_VIEWBOX.height}`}
+        preserveAspectRatio="none"
+        style={{
+          width: `${width}px`,
+          height: `${height}px`,
+          background: 'transparent',
+          pointerEvents: 'none',
+          filter: 'drop-shadow(0 14px 18px rgba(0, 0, 0, 0.48))',
+        }}
+        className="transition-all duration-300 overflow-visible block"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <path d={CLOG_REGIONS.bodySilhouette} fill={palette.seamColor} />
+        <ShoeSvgDefs side={side} palette={palette} />
 
-        <g clipPath={`url(#shoe-clip-${side})`} filter={`url(#foam-grain-${side})`}>
-          <path d={CLOG_REGIONS.mainVamp} fill={`url(#vamp-grad-${side})`} />
-          <path d={CLOG_REGIONS.mainVamp} fill={`url(#vamp-sheen-${side})`} />
-          <path d={CLOG_REGIONS.footbed} fill={`url(#footbed-grad-${side})`} />
-          <path d={CLOG_REGIONS.footbed} fill="none" stroke="rgba(0, 0, 0, 0.25)" strokeWidth="3.5" />
-          <path d={FOOTBED_NUBS_PATH} fill={palette.nubHighlight} opacity={0.45} transform="translate(-0.5, -0.6)" />
-          <path d={FOOTBED_NUBS_PATH} fill={palette.nubShadow} opacity={0.82} />
-          <path d={CLOG_REGIONS.collarRim} fill={`url(#collar-grad-${side})`} fillRule="evenodd" />
-          <path d={CLOG_REGIONS.strapOutline} fill={palette.seamColor} />
-          <path d={CLOG_REGIONS.strapBody} fill={`url(#strap-grad-${side})`} />
-          <path d={CLOG_REGIONS.strapRivets} fill="#111318" />
+        {/* Shoe Geometry Group (Right shoe is mirrored horizontally) */}
+        <g
+          className="pointer-events-auto"
+          transform={
+            isLeft ? undefined : `translate(${SHOE_VIEWBOX.width}, 0) scale(-1, 1)`
+          }
+        >
+          <path d={CLOG_REGIONS.bodySilhouette} fill={palette.seamColor} />
+
+          <g clipPath={`url(#shoe-clip-${side})`} filter={`url(#foam-grain-${side})`}>
+            <path d={CLOG_REGIONS.mainVamp} fill={`url(#vamp-grad-${side})`} />
+            <path d={CLOG_REGIONS.mainVamp} fill={`url(#vamp-sheen-${side})`} />
+            <path d={CLOG_REGIONS.footbed} fill={`url(#footbed-grad-${side})`} />
+            <path d={CLOG_REGIONS.footbed} fill="none" stroke="rgba(0, 0, 0, 0.25)" strokeWidth="3.5" />
+            <path d={FOOTBED_NUBS_PATH} fill={palette.nubHighlight} opacity={0.45} transform="translate(-0.5, -0.6)" />
+            <path d={FOOTBED_NUBS_PATH} fill={palette.nubShadow} opacity={0.82} />
+            <path d={CLOG_REGIONS.collarRim} fill={`url(#collar-grad-${side})`} fillRule="evenodd" />
+            <path d={CLOG_REGIONS.strapOutline} fill={palette.seamColor} />
+            <path d={CLOG_REGIONS.strapBody} fill={`url(#strap-grad-${side})`} />
+            <path d={CLOG_REGIONS.strapRivets} fill="#111318" />
+          </g>
         </g>
-      </g>
 
-      {/* 13 Vent Hole Sockets per shoe */}
-      <g data-shoe-interactive="true" className="pointer-events-auto">
-        {sizeHoles.map((h) => {
-          const id = `${prefix}-${String(h.index).padStart(2, '0')}` as HoleId;
-          const x = isLeft ? h.x : Number((SHOE_VIEWBOX.width - h.x).toFixed(1));
-          const holeObj: VentHole = {
-            id,
-            side,
-            index: h.index,
-            normalizedX: Number((x / SHOE_VIEWBOX.width).toFixed(3)),
-            normalizedY: Number((h.y / SHOE_VIEWBOX.height).toFixed(3)),
-          };
-          const placement = placementsByHole.get(id);
+        {/* 13 Vent Hole Sockets per shoe */}
+        <g data-shoe-interactive="true" className="pointer-events-auto">
+          {sizeHoles.map((h) => {
+            const id = `${prefix}-${String(h.index).padStart(2, '0')}` as HoleId;
+            const x = isLeft ? h.x : Number((SHOE_VIEWBOX.width - h.x).toFixed(1));
+            const holeObj: VentHole = {
+              id,
+              side,
+              index: h.index,
+              normalizedX: Number((x / SHOE_VIEWBOX.width).toFixed(3)),
+              normalizedY: Number((h.y / SHOE_VIEWBOX.height).toFixed(3)),
+            };
+            const placement = placementsByHole.get(id);
 
-          return (
-            <g key={id}>
-              <VentHoleSocket
-                hole={holeObj}
-                position={{ x, y: h.y }}
-                radius={h.r}
-                wallColor={palette.seamColor}
-                highlightColor={palette.highlightBright}
-                isOccupied={occupiedHoleIds.has(id)}
-                isSnapTarget={activeSnapHoleId === id}
-                onSelect={onHoleClick}
-              />
-
-              {/* Placed Charm on this Hole Socket */}
-              {placement && (
-                <PlacedCharmItem
-                  placement={placement}
+            return (
+              <g key={id}>
+                <VentHoleSocket
+                  hole={holeObj}
                   position={{ x, y: h.y }}
-                  isSelected={selectedPlacementId === placement.instanceId}
-                  onClick={(instId) => onCharmClick?.(instId)}
-                  onRotate={(instId, deg) => onRotateCharm?.(instId, deg)}
+                  radius={h.r}
+                  wallColor={palette.seamColor}
+                  highlightColor={palette.highlightBright}
+                  isOccupied={occupiedHoleIds.has(id)}
+                  isSnapTarget={activeSnapHoleId === id}
+                  onSelect={onHoleClick}
                 />
-              )}
-            </g>
-          );
-        })}
-      </g>
-    </svg>
-  );
-};
+
+                {/* Placed Charm on this Hole Socket */}
+                {placement && (
+                  <PlacedCharmItem
+                    placement={placement}
+                    position={{ x, y: h.y }}
+                    isSelected={selectedPlacementId === placement.instanceId}
+                    onClick={(instId) => onCharmClick?.(instId)}
+                    onRotate={(instId, deg) => onRotateCharm?.(instId, deg)}
+                  />
+                )}
+              </g>
+            );
+          })}
+        </g>
+      </svg>
+    );
+  }
+);
+
+SingleShoeSvg.displayName = 'SingleShoeSvg';

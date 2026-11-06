@@ -5,10 +5,11 @@ import { ShoeColorTab } from './components/controls/ShoeColorTab.js';
 import { JibbitzDiscoveryDrawer } from './components/discovery/JibbitzDiscoveryDrawer.js';
 import { useShoeCustomizer } from './hooks/useShoeCustomizer.js';
 import { useMobileDrawerDrag } from './hooks/useMobileDrawerDrag.js';
+import { CharmDragProvider } from './context/CharmDragProvider.js';
 
 type CustomizerTab = 'shoe' | 'charms';
 
-export const App: React.FC = () => {
+export const AppContent: React.FC = () => {
   const customizer = useShoeCustomizer();
   const size = customizer?.size ?? 'adult';
   const color = customizer?.color ?? DEFAULT_CROC_COLORS[0];
@@ -45,7 +46,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Determine dynamic mobile height style
   const mobileHeightStyle: React.CSSProperties =
     dragHeightPx !== null
       ? { height: `${dragHeightPx}px`, transition: 'none' }
@@ -62,15 +62,13 @@ export const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen w-full max-w-full overflow-hidden bg-[#031811] text-emerald-50 font-sans">
-      {/* Main Workspace Layout */}
       <main className="flex-1 flex flex-col-reverse md:flex-row relative overflow-hidden w-full h-full">
-        {/* Left Editing Window (Desktop Side Panel / Mobile Dynamic Bottom Sheet) */}
         <aside
           aria-label="Customizer editing workspace"
           style={mobileHeightStyle}
           className={`w-full md:w-[420px] lg:w-[450px] border-t md:border-t-0 md:border-r border-emerald-900/60 bg-[#06241a]/95 p-3 sm:p-4 flex flex-col gap-2.5 backdrop-blur-md shrink-0 z-20 shadow-2xl transition-all duration-200 ${mobileHeightClass}`}
         >
-          {/* Mobile Drag Handle: Supports Full Dragging Up and Down */}
+          {/* Mobile Drag Handle */}
           <div
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -114,7 +112,6 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Dynamic Segmented Mode Switcher */}
             <div
               role="tablist"
               aria-label="Customizer tool modes"
@@ -154,7 +151,7 @@ export const App: React.FC = () => {
 
           {/* Active Placement Hint Banner */}
           {activeCharmToPlace && (
-            <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-950 border border-emerald-600/60 text-xs shrink-0 shadow-md animate-pulse">
+            <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-950 border border-emerald-600/60 text-xs shrink-0 shadow-md">
               <div className="flex items-center gap-2">
                 <img
                   src={activeCharmToPlace.imageUrl}
@@ -162,7 +159,7 @@ export const App: React.FC = () => {
                   className="w-5 h-5 object-contain"
                 />
                 <span className="text-emerald-200 font-semibold truncate max-w-[200px]">
-                  Click any empty hole to place &ldquo;{activeCharmToPlace.name}&rdquo;
+                  Drag or click any empty hole to place &ldquo;{activeCharmToPlace.name}&rdquo;
                 </span>
               </div>
               <button
@@ -209,10 +206,19 @@ export const App: React.FC = () => {
             onCharmClick={(instId) => handlePlacementClick?.(instId)}
             onRotateCharm={(instId, deg) => updateRotation?.(instId, deg)}
             onCanvasClick={() => setSelectedPlacementId?.(null)}
+            onDropCharm={(charm, holeId) => placeCharm?.(charm, holeId)}
           />
         </section>
       </main>
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <CharmDragProvider>
+      <AppContent />
+    </CharmDragProvider>
   );
 };
 

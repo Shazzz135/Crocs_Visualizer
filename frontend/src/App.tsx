@@ -25,7 +25,7 @@ export const AppContent: React.FC = () => {
     setActiveCharmToPlace,
     setSelectedPlacementId,
     placeCharm,
-    moveCharm,
+    swapOrMoveCharm,
     removePlacementByHole,
     updateRotation,
     handlePlacementClick,
@@ -60,12 +60,12 @@ export const AppContent: React.FC = () => {
     }
   };
 
-  const handleDropCharm = (charm: JibbitzItem, targetHoleId: HoleId, sourceHoleId?: HoleId | null) => {
+  const handleDropCharm = (charm: JibbitzItem, targetHoleId: HoleId, sourceHoleId?: HoleId | null, rotationDeg?: number) => {
     if (sourceHoleId) {
       if (sourceHoleId === targetHoleId) return;
-      moveCharm?.(sourceHoleId, targetHoleId);
+      swapOrMoveCharm?.(sourceHoleId, targetHoleId);
     } else {
-      placeCharm?.(charm, targetHoleId);
+      placeCharm?.(charm, targetHoleId, rotationDeg);
     }
   };
 

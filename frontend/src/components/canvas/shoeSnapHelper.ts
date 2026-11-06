@@ -47,7 +47,9 @@ export function findHoleOnShoe({
 
   for (const h of sizeHoles) {
     const hId = `${prefix}-${String(h.index).padStart(2, '0')}` as HoleId;
-    if (occupiedHoleIds.has(hId) && hId !== sourceHoleId) continue;
+    // When dragging from catalog (!sourceHoleId), only snap to empty holes.
+    // When dragging an existing placed charm (sourceHoleId), allow snapping to occupied holes so charms can swap!
+    if (!sourceHoleId && occupiedHoleIds.has(hId)) continue;
 
     const hx = isLeft ? h.x : SHOE_VIEWBOX.width - h.x;
     const dist = Math.hypot(svgPt.x - hx, svgPt.y - h.y);
@@ -68,7 +70,7 @@ export function findHoleOnShoe({
     let fallbackMin = Infinity;
     for (const h of sizeHoles) {
       const hId = `${prefix}-${String(h.index).padStart(2, '0')}` as HoleId;
-      if (occupiedHoleIds.has(hId) && hId !== sourceHoleId) continue;
+      if (!sourceHoleId && occupiedHoleIds.has(hId)) continue;
       const hx = isLeft ? h.x : SHOE_VIEWBOX.width - h.x;
       const dist = Math.hypot(svgPt.x - hx, svgPt.y - h.y);
       if (dist < fallbackMin) {

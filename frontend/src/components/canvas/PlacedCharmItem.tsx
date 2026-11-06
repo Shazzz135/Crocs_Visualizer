@@ -20,7 +20,6 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
 }) => {
   const charm = placement.charm;
   const imageUrl = charm?.imageUrl ?? `/catalog/images/${placement.jibbitId}.png`;
-  // Doubled from 36px to 72px to match true proportions shown in reference/charm_ref.jpg
   const sizePx = 72;
   const halfSize = sizePx / 2;
 
@@ -31,7 +30,6 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
     dragState.isDragging && dragState.sourceInstanceId === placement.instanceId;
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    // Stop propagation so canvas zoom/pan doesn't move the screen when dragging charm
     e.stopPropagation();
     if (e.button !== 0) return;
     const target = e.target as Element | null;
@@ -47,11 +45,13 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
       if (Math.hypot(dx, dy) > 5 && !pointerStartRef.current.moved) {
         pointerStartRef.current.moved = true;
         if (charm) {
+          // Pass placement.rotationDeg so it holds its exact rotation in the air
           startDrag(
             charm,
             { x: moveEvt.clientX, y: moveEvt.clientY },
             placement.holeId,
-            placement.instanceId
+            placement.instanceId,
+            placement.rotationDeg
           );
         }
         cleanup();
@@ -110,12 +110,12 @@ export const PlacedCharmItem: React.FC<PlacedCharmItemProps> = ({
         />
       </g>
 
-      {/* Rotation Dial Halo (shown when charm is selected and not being dragged) */}
+      {/* Rotation Dial Halo with large mobile-friendly rotate point */}
       {isSelected && !isBeingDragged && (
         <RotationDial
           center={{ x: 0, y: 0 }}
           rotationDeg={placement.rotationDeg}
-          radius={halfSize + 8}
+          radius={halfSize + 16}
           onRotate={(deg) => onRotate(placement.instanceId, deg)}
         />
       )}

@@ -6,6 +6,7 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     charm: null,
+    rotationDeg: 0,
     sourceHoleId: null,
     sourceInstanceId: null,
     pointerPos: null,
@@ -22,11 +23,13 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       charm: JibbitzItem,
       startPos: { x: number; y: number },
       sourceHoleId?: HoleId | null,
-      sourceInstanceId?: string | null
+      sourceInstanceId?: string | null,
+      rotationDeg = 0
     ) => {
       const nextState: DragState = {
         isDragging: true,
         charm,
+        rotationDeg,
         sourceHoleId: sourceHoleId ?? null,
         sourceInstanceId: sourceInstanceId ?? null,
         pointerPos: startPos,
@@ -60,10 +63,12 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         holeId: targetHoleId,
         sourceHoleId: current.sourceHoleId,
         sourceInstanceId: current.sourceInstanceId,
+        rotationDeg: current.rotationDeg ?? 0,
       };
       const resetState: DragState = {
         isDragging: false,
         charm: null,
+        rotationDeg: 0,
         sourceHoleId: null,
         sourceInstanceId: null,
         pointerPos: null,
@@ -76,6 +81,7 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const resetState: DragState = {
       isDragging: false,
       charm: null,
+      rotationDeg: 0,
       sourceHoleId: null,
       sourceInstanceId: null,
       pointerPos: null,
@@ -90,6 +96,7 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const resetState: DragState = {
       isDragging: false,
       charm: null,
+      rotationDeg: 0,
       sourceHoleId: null,
       sourceInstanceId: null,
       pointerPos: null,
@@ -111,7 +118,7 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     >
       {children}
 
-      {/* Floating Drag Overlay: Image on cursor with NO border and NO background */}
+      {/* Floating Drag Overlay: Charm holds rotation angle in the air with no borders or backgrounds */}
       {dragState.isDragging && dragState.charm && dragState.pointerPos && (
         <div
           className="fixed pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2 select-none"
@@ -125,7 +132,10 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           <img
             src={dragState.charm.imageUrl}
             alt={dragState.charm.name}
-            className="w-full h-full object-contain filter drop-shadow(0 6px 12px rgba(0,0,0,0.45)) pointer-events-none"
+            style={{
+              transform: `rotate(${dragState.rotationDeg ?? 0}deg)`,
+            }}
+            className="w-full h-full object-contain filter drop-shadow(0 8px 16px rgba(0,0,0,0.5)) pointer-events-none"
           />
         </div>
       )}

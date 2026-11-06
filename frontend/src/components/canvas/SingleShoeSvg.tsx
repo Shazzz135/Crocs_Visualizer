@@ -58,7 +58,7 @@ export const SingleShoeSvg = forwardRef<SVGSVGElement, SingleShoeSvgProps>(
       <svg
         ref={ref}
         viewBox={`0 0 ${SHOE_VIEWBOX.width} ${SHOE_VIEWBOX.height}`}
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid meet"
         style={{
           width: `${width}px`,
           height: `${height}px`,

@@ -9,7 +9,7 @@ import {
   type PlacedJibbitz,
   type VentHole,
 } from '@crocs/shared';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SHOE_HOLES_BY_SIZE } from '../components/canvas/shoeHoleConfig.js';
 
 export interface ShoeCustomizerState {
@@ -26,7 +26,7 @@ export interface ShoeCustomizerState {
   setActiveCharmToPlace: (charm: JibbitzItem | null) => void;
   setSelectedPlacementId: (id: string | null) => void;
   placeCharm: (charm: JibbitzItem, holeId: HoleId, rotationDeg?: number) => void;
-  moveCharm: (fromHoleId: HoleId, toHoleId: HoleId) => void;
+  swapOrMoveCharm: (fromHoleId: HoleId, toHoleId: HoleId) => void;
   updateRotation: (instanceId: string, rotationDeg: number) => void;
   removePlacement: (instanceId: string) => void;
   removePlacementByHole: (holeId: HoleId) => void;
@@ -42,6 +42,7 @@ export function useShoeCustomizer(): ShoeCustomizerState {
   const [placements, setPlacements] = useState<PlacedJibbitz[]>([]);
   const [activeCharmToPlace, setActiveCharmToPlace] = useState<JibbitzItem | null>(null);
   const [selectedPlacementId, setSelectedPlacementId] = useState<string | null>(null);
+  const deselectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clickTrackerRef = useRef<ClickTrackerState>({
     targetId: null,
@@ -52,6 +53,26 @@ export function useShoeCustomizer(): ShoeCustomizerState {
   const occupiedHoleIds = useMemo(() => {
     return new Set(placements.map((p) => p.holeId));
   }, [placements]);
+
+  // Automatically deselect / remove green outline after 1 second of inactivity
+  const selectPlacement = useCallback((id: string | null) => {
+    if (deselectTimerRef.current) {
+      clearTimeout(deselectTimerRef.current);
+      deselectTimerRef.current = null;
+    }
+    setSelectedPlacementId(id);
+    if (id) {
+      deselectTimerRef.current = setTimeout(() => {
+        setSelectedPlacementId(null);
+      }, 1000);
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (deselectTimerRef.current) clearTimeout(deselectTimerRef.current);
+    };
+  }, []);
 
   const findFirstAvailableHole = useCallback((): HoleId | null => {
     const sizeHoles = SHOE_HOLES_BY_SIZE[size] ?? SHOE_HOLES_BY_SIZE.adult;
@@ -80,35 +101,60 @@ export function useShoeCustomizer(): ShoeCustomizerState {
       };
       return [...filtered, newPlacement];
     });
-    setSelectedPlacementId(newInstId);
+    selectPlacement(newInstId);
     setActiveCharmToPlace(null);
-  }, []);
+  }, [selectPlacement]);
 
-  const moveCharm = useCallback((fromHoleId: HoleId, toHoleId: HoleId) => {
+  const swapOrMoveCharm = useCallback((fromHoleId: HoleId, toHoleId: HoleId) => {
     if (fromHoleId === toHoleId) return;
+    let targetInstId: string | null = null;
     setPlacements((prev) => {
-      const existing = prev.find((p) => p.holeId === fromHoleId);
-      if (!existing) return prev;
-      const filtered = prev.filter((p) => p.holeId !== toHoleId && p.holeId !== fromHoleId);
-      return [...filtered, { ...existing, holeId: toHoleId, placedAt: Date.now() }];
+      const sourcePlacement = prev.find((p) => p.holeId === fromHoleId);
+      if (!sourcePlacement) return prev;
+      targetInstId = sourcePlacement.instanceId;
+
+      const targetPlacement = prev.find((p) => p.holeId === toHoleId);
+      if (targetPlacement) {
+        // Swap both charms while preserving their respective rotations
+        return prev.map((p) => {
+          if (p.instanceId === sourcePlacement.instanceId) {
+            return { ...p, holeId: toHoleId, placedAt: Date.now() };
+          }
+          if (p.instanceId === targetPlacement.instanceId) {
+            return { ...p, holeId: fromHoleId, placedAt: Date.now() };
+          }
+          return p;
+        });
+      }
+
+      // Empty hole target -> regular move
+      return prev.map((p) =>
+        p.instanceId === sourcePlacement.instanceId
+          ? { ...p, holeId: toHoleId, placedAt: Date.now() }
+          : p
+      );
     });
-  }, []);
+    if (targetInstId) {
+      selectPlacement(targetInstId);
+    }
+  }, [selectPlacement]);
 
   const updateRotation = useCallback((instanceId: string, rotationDeg: number) => {
     setPlacements((prev) =>
       prev.map((p) => (p.instanceId === instanceId ? { ...p, rotationDeg } : p))
     );
-  }, []);
+    selectPlacement(instanceId);
+  }, [selectPlacement]);
 
   const removePlacement = useCallback((instanceId: string) => {
     setPlacements((prev) => prev.filter((p) => p.instanceId !== instanceId));
-    setSelectedPlacementId((prev) => (prev === instanceId ? null : prev));
-  }, []);
+    selectPlacement(null);
+  }, [selectPlacement]);
 
   const removePlacementByHole = useCallback((holeId: HoleId) => {
     setPlacements((prev) => prev.filter((p) => p.holeId !== holeId));
-    setSelectedPlacementId(null);
-  }, []);
+    selectPlacement(null);
+  }, [selectPlacement]);
 
   const handlePlacementClick = useCallback(
     (instanceId: string) => {
@@ -119,10 +165,10 @@ export function useShoeCustomizer(): ShoeCustomizerState {
       if (result.shouldDelete) {
         removePlacement(instanceId);
       } else if (result.isSelected) {
-        setSelectedPlacementId(instanceId);
+        selectPlacement(instanceId);
       }
     },
-    [removePlacement]
+    [removePlacement, selectPlacement]
   );
 
   const resetCustomizer = useCallback(() => {
@@ -131,8 +177,8 @@ export function useShoeCustomizer(): ShoeCustomizerState {
     setActiveHole(null);
     setPlacements([]);
     setActiveCharmToPlace(null);
-    setSelectedPlacementId(null);
-  }, []);
+    selectPlacement(null);
+  }, [selectPlacement]);
 
   return {
     size,
@@ -146,9 +192,9 @@ export function useShoeCustomizer(): ShoeCustomizerState {
     setColor,
     setActiveHole,
     setActiveCharmToPlace,
-    setSelectedPlacementId,
+    setSelectedPlacementId: selectPlacement,
     placeCharm,
-    moveCharm,
+    swapOrMoveCharm,
     updateRotation,
     removePlacement,
     removePlacementByHole,

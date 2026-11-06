@@ -17,7 +17,7 @@ interface ShoeCanvasProps {
   onCharmClick?: (instanceId: string) => void;
   onRotateCharm?: (instanceId: string, deg: number) => void;
   onCanvasClick?: () => void;
-  onDropCharm?: (charm: JibbitzItem, holeId: HoleId, sourceHoleId?: HoleId | null) => void;
+  onDropCharm?: (charm: JibbitzItem, holeId: HoleId, sourceHoleId?: HoleId | null, rotationDeg?: number) => void;
   onRemoveCharm?: (sourceHoleId: HoleId) => void;
 }
 
@@ -101,7 +101,7 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
       const dropped = endDrag(finalHoleId);
 
       if (dropped && onDropCharm) {
-        onDropCharm(dropped.charm, dropped.holeId, dropped.sourceHoleId);
+        onDropCharm(dropped.charm, dropped.holeId, dropped.sourceHoleId, dropped.rotationDeg);
       } else if (!finalHoleId && sourceHole && onRemoveCharm) {
         // Dragged off shoe and dropped in empty canvas -> remove from shoe
         onRemoveCharm(sourceHole);

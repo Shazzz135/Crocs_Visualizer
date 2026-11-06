@@ -19,8 +19,8 @@ export const SizeSelector: React.FC<SizeSelectorProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-        Shoe Size & Proportion
+      <label className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+        Shoe Size &amp; Proportion
       </label>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {SIZE_OPTIONS.map((opt) => {
@@ -30,14 +30,14 @@ export const SizeSelector: React.FC<SizeSelectorProps> = ({
               key={opt.id}
               type="button"
               onClick={() => onSelectSize(opt.id)}
-              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg border text-xs transition-all ${
+              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg border text-xs transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-sky-500/15 border-sky-400 text-sky-200 font-semibold shadow-md shadow-sky-500/10'
-                  : 'bg-slate-800/80 border-slate-700/80 text-slate-300 hover:border-slate-500'
+                  ? 'bg-emerald-500/20 border-emerald-400 text-emerald-100 font-semibold shadow-md shadow-emerald-500/20 ring-1 ring-emerald-400'
+                  : 'bg-[#02130e]/80 border-emerald-900/80 text-emerald-300/80 hover:border-emerald-700 hover:bg-[#06241a] hover:text-emerald-100'
               }`}
             >
               <span>{opt.label}</span>
-              <span className="text-[10px] text-slate-400 mt-0.5">{opt.badge}</span>
+              <span className="text-[10px] text-emerald-400/70 mt-0.5">{opt.badge}</span>
             </button>
           );
         })}

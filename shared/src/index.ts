@@ -10,3 +10,6 @@ export * from './utils/sizing.js';
 
 // Collision & snapping engine
 export * from './utils/collision.js';
+
+// Semantic vector search & discovery engine
+export * from './utils/search.js';

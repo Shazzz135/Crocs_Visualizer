@@ -18,9 +18,12 @@ export interface JibbitzItem {
   name: string;
   category: JibbitzCategory;
   imageUrl: string;
+  price?: number;
+  aspectRatio?: number;
   dimensions?: JibbitzDimensions;
   description?: string;
-  // Pre-computed vector embedding (optional on client)
+  tags?: string[];
+  // Pre-computed 384-dimensional vector embedding for semantic search
   embedding?: number[];
 }
 

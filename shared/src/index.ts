@@ -19,3 +19,6 @@ export * from './utils/rotation.js';
 
 // Deliberate 3-click deletion engine
 export * from './utils/deletion.js';
+
+// Local storage persistence & schema validation
+export * from './utils/storage.js';

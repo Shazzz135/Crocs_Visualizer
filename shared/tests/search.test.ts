@@ -80,16 +80,25 @@ describe('Search and Embedding Utilities', () => {
         tags: ['pizza', 'cheese'],
         embedding: pizzaEmbed,
       },
+      {
+        id: '3',
+        name: 'Soccer Ball',
+        category: 'sports',
+        imageUrl: '/test3.png',
+      },
     ];
 
     const results = searchJibbitz(items, 'cute puppy');
-    expect(results.length).toBe(2);
+    expect(results.length).toBe(3);
     expect(results[0].id).toBe('1');
     expect(results[0].score).toBeGreaterThan(results[1].score);
 
-    // Test category filter
-    const foodOnly = searchJibbitz(items, '', { category: 'food-drink' });
-    expect(foodOnly.length).toBe(1);
-    expect(foodOnly[0].id).toBe('2');
+    // Test multi-category filter
+    const multiFilter = searchJibbitz(items, '', { categories: ['animals-nature', 'sports'] });
+    expect(multiFilter.length).toBe(2);
+    const ids = multiFilter.map((i) => i.id);
+    expect(ids).toContain('1');
+    expect(ids).toContain('3');
+    expect(ids).not.toContain('2');
   });
 });

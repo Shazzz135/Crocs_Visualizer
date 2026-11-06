@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import type { JibbitzCategory, JibbitzItem } from '@crocs/shared';
-import { searchJibbitz, type ScoredJibbitzItem } from '@crocs/shared';
+import { searchJibbitz } from '@crocs/shared';
 import { SearchBar } from './SearchBar.js';
 import { CategoryFilterBar } from './CategoryFilterBar.js';
 import { CharmGrid } from './CharmGrid.js';
@@ -23,7 +23,7 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
   selectedCharmId,
 }) => {
   const [catalog, setCatalog] = useState<CatalogResponse | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCharm, setActiveCharm] = useState<JibbitzItem | null>(null);
 
@@ -38,7 +38,7 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
       .catch((err) => console.error('[JibbitzDrawer] Fetch error:', err));
   }, []);
 
-  // Compute item counts per category for the filter pills
+  // Compute item counts per category
   const categoryCounts = useMemo(() => {
     if (!catalog?.items) return {};
     const counts: Record<string, number> = { all: catalog.items.length };
@@ -48,13 +48,28 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
     return counts;
   }, [catalog]);
 
-  // Instant semantic hybrid search across all charms
+  // Multi-select toggle handler
+  const handleToggleCategory = (cat: string) => {
+    if (cat === 'all') {
+      setSelectedCategories([]);
+      return;
+    }
+    setSelectedCategories((prev) => {
+      const active = prev.includes(cat);
+      if (active) {
+        return prev.filter((c) => c !== cat);
+      }
+      return [...prev.filter((c) => c !== 'all'), cat];
+    });
+  };
+
+  // Instant semantic hybrid search across multi-select categories
   const displayedItems = useMemo(() => {
     if (!catalog?.items) return [];
     return searchJibbitz(catalog.items, searchQuery, {
-      category: selectedCategory as JibbitzCategory | 'all',
+      categories: selectedCategories.length > 0 ? selectedCategories : undefined,
     });
-  }, [catalog, searchQuery, selectedCategory]);
+  }, [catalog, searchQuery, selectedCategories]);
 
   const handleSelectCharm = (charm: JibbitzItem) => {
     setActiveCharm(charm);
@@ -69,11 +84,6 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
     );
   }
 
-  const selectedScore =
-    activeCharm && 'score' in (activeCharm as ScoredJibbitzItem)
-      ? (activeCharm as ScoredJibbitzItem).score
-      : undefined;
-
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full w-full gap-3">
       {/* Search Bar with AI Semantic Indicator */}
@@ -85,11 +95,11 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
         isSemanticActive={searchQuery.trim().length > 0}
       />
 
-      {/* Category Pills with Instant Filtering */}
+      {/* Multi-Select Category Pills */}
       <CategoryFilterBar
         categories={catalog.categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+        selectedCategories={selectedCategories}
+        onToggleCategory={handleToggleCategory}
         categoryCounts={categoryCounts}
       />
 
@@ -97,14 +107,13 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
       {activeCharm && (
         <CharmDetailCard
           charm={activeCharm}
-          similarityScore={selectedScore}
           onClose={() => setActiveCharm(null)}
         />
       )}
 
       {/* Charms Grid with All Charms Always Loaded */}
       <CharmGrid
-        key={`${searchQuery}-${selectedCategory}`}
+        key={`${searchQuery}-${selectedCategories.slice().sort().join(',')}`}
         items={displayedItems}
         selectedCharmId={activeCharm?.id ?? selectedCharmId}
         onSelectCharm={handleSelectCharm}

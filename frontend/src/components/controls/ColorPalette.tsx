@@ -12,16 +12,7 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between">
-        <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Colorway
-        </label>
-        <span className="text-xs text-slate-300 font-medium">
-          {DEFAULT_CROC_COLORS.find((c) => c.id === selectedColorId)?.name || 'Custom'}
-        </span>
-      </div>
-
-      <div className="flex flex-wrap gap-2.5 items-center">
+      <div className="grid grid-cols-7 sm:grid-cols-8 gap-2 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800">
         {DEFAULT_CROC_COLORS.map((color) => {
           const isSelected = selectedColorId === color.id;
           return (
@@ -30,9 +21,9 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({
               type="button"
               onClick={() => onSelectColor(color)}
               title={`${color.name} (${color.hex})`}
-              className={`w-8 h-8 rounded-full border-2 transition-transform duration-150 hover:scale-110 focus:outline-none ${
+              className={`w-8 h-8 rounded-full border-2 transition-transform duration-150 hover:scale-110 focus:outline-none cursor-pointer mx-auto ${
                 isSelected
-                  ? 'border-sky-400 ring-2 ring-sky-400/50 scale-110 shadow-lg'
+                  ? 'border-emerald-400 ring-2 ring-emerald-400/60 scale-110 shadow-lg shadow-emerald-500/25'
                   : 'border-slate-600/80 hover:border-slate-400'
               }`}
               style={{ backgroundColor: color.hex }}

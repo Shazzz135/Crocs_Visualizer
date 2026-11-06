@@ -33,7 +33,7 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
           No matching Jibbitz found
         </p>
         <p className="text-[11px] text-slate-500 mt-1 max-w-xs">
-          Try searching for &ldquo;cute puppy&rdquo;, &ldquo;gold alphabet&rdquo;, or &ldquo;retro music&rdquo;.
+          Try a different keyword or toggle more category filters.
         </p>
       </div>
     );
@@ -45,7 +45,7 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
       <div
         tabIndex={0}
         aria-label="Jibbitz charms catalog grid"
-        className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-2 overflow-y-auto p-2 bg-slate-950/60 rounded-xl border border-slate-800/80 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent flex-1 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
+        className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-2 overflow-y-auto p-2 bg-slate-950/70 rounded-xl border border-slate-800/80 scrollbar-thin scrollbar-thumb-emerald-900/60 scrollbar-track-transparent flex-1 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
       >
         {items.map((item) => {
           const isSelected = selectedCharmId === item.id;
@@ -58,9 +58,9 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
               type="button"
               onClick={() => onSelectCharm(item)}
               title={`${item.name} (${item.category})`}
-              className={`group relative flex flex-col items-center justify-center p-2 rounded-lg border transition-all aspect-square focus:outline-none focus:ring-2 focus:ring-sky-400 ${
+              className={`group relative flex flex-col items-center justify-center p-2 rounded-xl border transition-all aspect-square focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer ${
                 isSelected
-                  ? 'border-sky-400 bg-sky-950/50 shadow-md shadow-sky-500/20 ring-1 ring-sky-400'
+                  ? 'border-emerald-400 bg-emerald-950/50 shadow-md shadow-emerald-500/25 ring-1 ring-emerald-400'
                   : 'border-slate-800/90 hover:border-slate-700 bg-slate-900/50 hover:bg-slate-900/90'
               }`}
             >
@@ -82,7 +82,7 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
               {/* Semantic match dot badge if scored */}
               {score !== undefined && score > 0.8 && (
                 <span
-                  title="High Semantic Match"
+                  title="Semantic Match"
                   className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-slate-950"
                 />
               )}

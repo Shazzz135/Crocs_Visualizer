@@ -26,7 +26,6 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
 
   const {
     containerRef,
-    zoom,
     pan,
     isPanning,
     effectiveScale,
@@ -55,32 +54,37 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
         isPanning ? 'cursor-grabbing' : 'cursor-grab'
       }`}
     >
-      {/* Floating Zoom & Reset Controls */}
+      {/* Floating Zoom Controls (Crocs Green Themed, Clean Icons, No % indicator) */}
       <div
         data-zoom-hud="true"
-        className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex items-center gap-1 bg-slate-900/80 border border-slate-800 rounded-lg px-2 py-1 backdrop-blur-md shadow-lg cursor-default"
+        className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex items-center gap-1 bg-slate-900/90 border border-slate-800 rounded-lg px-2 py-1 backdrop-blur-md shadow-lg cursor-default"
       >
         <button
           type="button"
           onClick={zoomOut}
           aria-label="Zoom out"
-          className="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-colors text-sm font-bold cursor-pointer"
+          title="Zoom out"
+          className="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-emerald-400 hover:bg-slate-800 transition-colors text-sm font-bold cursor-pointer"
         >
           −
         </button>
         <button
           type="button"
           onClick={resetZoom}
-          title="Reset zoom and position"
-          className="px-1.5 text-[11px] font-mono text-slate-300 hover:text-sky-400 transition-colors cursor-pointer"
+          aria-label="Reset zoom"
+          title="Reset canvas"
+          className="px-1.5 py-0.5 text-xs text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded transition-colors cursor-pointer"
         >
-          {Math.round(zoom * 100)}%
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
         </button>
         <button
           type="button"
           onClick={zoomIn}
           aria-label="Zoom in"
-          className="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-white hover:bg-slate-800 transition-colors text-sm font-bold cursor-pointer"
+          title="Zoom in"
+          className="w-6 h-6 flex items-center justify-center rounded text-slate-300 hover:text-emerald-400 hover:bg-slate-800 transition-colors text-sm font-bold cursor-pointer"
         >
           +
         </button>
@@ -119,14 +123,6 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
           activeSnapHoleId={activeSnapHoleId}
           onHoleClick={onHoleClick}
         />
-      </div>
-
-      {/* Dimension, Aspect Ratio & Gesture Hint */}
-      <div
-        data-zoom-hud="true"
-        className="mt-3 z-20 text-[10px] sm:text-[11px] text-slate-400 font-medium bg-slate-900/70 px-3 py-1 rounded-full border border-slate-800 backdrop-blur-sm text-center cursor-default"
-      >
-        {displaySpec.label} • Scroll at cursor to zoom • Click &amp; drag anywhere to pan
       </div>
     </div>
   );

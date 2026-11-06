@@ -20,7 +20,7 @@ export const SizeSelector: React.FC<SizeSelectorProps> = ({
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-        Shoe Size & Proportion
+        Shoe Size &amp; Proportion
       </label>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {SIZE_OPTIONS.map((opt) => {
@@ -30,10 +30,10 @@ export const SizeSelector: React.FC<SizeSelectorProps> = ({
               key={opt.id}
               type="button"
               onClick={() => onSelectSize(opt.id)}
-              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg border text-xs transition-all ${
+              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg border text-xs transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-sky-500/15 border-sky-400 text-sky-200 font-semibold shadow-md shadow-sky-500/10'
-                  : 'bg-slate-800/80 border-slate-700/80 text-slate-300 hover:border-slate-500'
+                  ? 'bg-emerald-500/15 border-emerald-400 text-emerald-200 font-semibold shadow-md shadow-emerald-500/10 ring-1 ring-emerald-400/40'
+                  : 'bg-slate-800/80 border-slate-700/80 text-slate-300 hover:border-slate-500 hover:bg-slate-800'
               }`}
             >
               <span>{opt.label}</span>

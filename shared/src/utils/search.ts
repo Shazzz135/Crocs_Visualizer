@@ -8,6 +8,7 @@ export interface ScoredJibbitzItem extends JibbitzItem {
 
 export interface SearchOptions {
   category?: JibbitzCategory | 'all';
+  categories?: (JibbitzCategory | string)[];
   limit?: number;
   minScoreThreshold?: number;
 }
@@ -112,21 +113,32 @@ export function calculateTextScore(
 
 /**
  * Hybrid search combining client-side vector similarity and token matching.
+ * Supports multi-select category filter sets.
  */
 export function searchJibbitz(
   items: JibbitzItem[],
   query: string,
   options: SearchOptions = {}
 ): ScoredJibbitzItem[] {
-  const { category = 'all', limit, minScoreThreshold = 0.0 } = options;
+  const { category = 'all', categories, limit, minScoreThreshold = 0.0 } = options;
   const trimmed = query.trim();
 
-  // If no search query, filter by category only and preserve default order
+  // Multi-select category filtering support
+  const activeCatSet =
+    categories && categories.length > 0 && !categories.includes('all')
+      ? new Set(categories)
+      : category && category !== 'all'
+      ? new Set([category])
+      : null;
+
+  const matchesCategory = (item: JibbitzItem): boolean => {
+    if (!activeCatSet) return true;
+    return activeCatSet.has(item.category);
+  };
+
+  // If no search query, filter by categories only and preserve default order
   if (!trimmed) {
-    const filtered =
-      category === 'all'
-        ? items
-        : items.filter((item) => item.category === category);
+    const filtered = activeCatSet ? items.filter(matchesCategory) : items;
 
     return filtered.map((item) => ({
       ...item,
@@ -143,7 +155,7 @@ export function searchJibbitz(
   const results: ScoredJibbitzItem[] = [];
 
   for (const item of items) {
-    if (category !== 'all' && item.category !== category) {
+    if (!matchesCategory(item)) {
       continue;
     }
 

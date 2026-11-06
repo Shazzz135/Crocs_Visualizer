@@ -3,6 +3,7 @@ import { DEFAULT_CROC_COLORS, type HoleId, type JibbitzItem, type VentHole } fro
 import { ShoeCanvas } from './components/canvas/ShoeCanvas.js';
 import { ShoeColorTab } from './components/controls/ShoeColorTab.js';
 import { JibbitzDiscoveryDrawer } from './components/discovery/JibbitzDiscoveryDrawer.js';
+import { LegalDisclaimerModal } from './components/common/LegalDisclaimerModal.js';
 import { useShoeCustomizer } from './hooks/useShoeCustomizer.js';
 import { useMobileDrawerDrag } from './hooks/useMobileDrawerDrag.js';
 import { CharmDragProvider } from './context/CharmDragProvider.js';
@@ -30,9 +31,11 @@ export const AppContent: React.FC = () => {
     updateRotation,
     handlePlacementClick,
     findFirstAvailableHole,
+    resetCustomizer,
   } = customizer ?? {};
 
   const [activeTab, setActiveTab] = useState<CustomizerTab>('charms');
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
   const {
     position: drawerPos,
     dragHeightPx,
@@ -43,21 +46,15 @@ export const AppContent: React.FC = () => {
     toggleDrawer,
   } = useMobileDrawerDrag();
 
-  // Click on charm in catalog automatically adds to an empty hole
   const handleSelectCharm = (charm: JibbitzItem) => {
     const emptyHoleId = findFirstAvailableHole?.();
-    if (emptyHoleId) {
-      placeCharm?.(charm, emptyHoleId);
-    } else {
-      setActiveCharmToPlace?.(charm);
-    }
+    if (emptyHoleId) placeCharm?.(charm, emptyHoleId);
+    else setActiveCharmToPlace?.(charm);
   };
 
   const handleHoleClick = (hole: VentHole) => {
     setActiveHole?.(hole);
-    if (activeCharmToPlace) {
-      placeCharm?.(activeCharmToPlace, hole.id);
-    }
+    if (activeCharmToPlace) placeCharm?.(activeCharmToPlace, hole.id);
   };
 
   const handleDropCharm = (charm: JibbitzItem, targetHoleId: HoleId, sourceHoleId?: HoleId | null, rotationDeg?: number) => {
@@ -70,9 +67,7 @@ export const AppContent: React.FC = () => {
   };
 
   const mobileHeightStyle: React.CSSProperties =
-    dragHeightPx !== null
-      ? { height: `${dragHeightPx}px`, transition: 'none' }
-      : {};
+    dragHeightPx !== null ? { height: `${dragHeightPx}px`, transition: 'none' } : {};
 
   const mobileHeightClass =
     dragHeightPx !== null
@@ -105,7 +100,7 @@ export const AppContent: React.FC = () => {
             </span>
           </div>
 
-          {/* Header Bar */}
+          {/* Header Bar with Quick Reset and Size Indicator */}
           <div className="flex items-center justify-between pb-1.5 border-b border-emerald-900/60 shrink-0">
             <div>
               <h1 className="text-sm sm:text-base font-bold text-white tracking-wide">CROCS CUSTOMIZER</h1>
@@ -115,6 +110,17 @@ export const AppContent: React.FC = () => {
               <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-full">
                 {size}
               </span>
+              <button
+                type="button"
+                onClick={() => resetCustomizer?.()}
+                title="Quick Reset: Clear placed charms and reset canvas"
+                className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 hover:text-white bg-emerald-950 hover:bg-red-950/80 border border-emerald-700/60 hover:border-red-500/60 rounded-full transition-all cursor-pointer shadow-sm active:scale-95"
+              >
+                <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Reset</span>
+              </button>
             </div>
           </div>
 
@@ -130,9 +136,7 @@ export const AppContent: React.FC = () => {
               aria-selected={activeTab === 'charms'}
               onClick={() => setActiveTab('charms')}
               className={`flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                activeTab === 'charms'
-                  ? 'bg-emerald-600 text-white shadow-md'
-                  : 'text-emerald-300/80 hover:text-white hover:bg-emerald-950/60'
+                activeTab === 'charms' ? 'bg-emerald-600 text-white shadow-md' : 'text-emerald-300/80 hover:text-white hover:bg-emerald-950/60'
               }`}
             >
               <span>Charms</span>
@@ -148,9 +152,7 @@ export const AppContent: React.FC = () => {
               aria-selected={activeTab === 'shoe'}
               onClick={() => setActiveTab('shoe')}
               className={`flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                activeTab === 'shoe'
-                  ? 'bg-emerald-600 text-white shadow-md'
-                  : 'text-emerald-300/80 hover:text-white hover:bg-emerald-950/60'
+                activeTab === 'shoe' ? 'bg-emerald-600 text-white shadow-md' : 'text-emerald-300/80 hover:text-white hover:bg-emerald-950/60'
               }`}
             >
               <span className="w-2.5 h-2.5 rounded-full border border-white/40" style={{ backgroundColor: color.hex }} />
@@ -162,11 +164,7 @@ export const AppContent: React.FC = () => {
           {activeCharmToPlace && (
             <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-950 border border-emerald-600/60 text-xs shrink-0 shadow-md">
               <div className="flex items-center gap-2">
-                <img
-                  src={activeCharmToPlace.imageUrl}
-                  alt={activeCharmToPlace.name}
-                  className="w-5 h-5 object-contain"
-                />
+                <img src={activeCharmToPlace.imageUrl} alt={activeCharmToPlace.name} className="w-5 h-5 object-contain" />
                 <span className="text-emerald-200 font-semibold truncate max-w-[200px]">
                   Placed on empty hole &bull; Drag to move
                 </span>
@@ -192,11 +190,20 @@ export const AppContent: React.FC = () => {
                 onNavigateToCharms={() => setActiveTab('charms')}
               />
             ) : (
-              <JibbitzDiscoveryDrawer
-                selectedCharmId={activeCharmToPlace?.id}
-                onSelectCharm={handleSelectCharm}
-              />
+              <JibbitzDiscoveryDrawer selectedCharmId={activeCharmToPlace?.id} onSelectCharm={handleSelectCharm} />
             )}
+          </div>
+
+          {/* Footer Legal & Disclaimers Link */}
+          <div className="pt-1.5 border-t border-emerald-900/60 flex items-center justify-between text-[10px] text-emerald-400/80 shrink-0">
+            <span className="truncate">Independent visualizer &bull; In-store prototype</span>
+            <button
+              type="button"
+              onClick={() => setIsLegalModalOpen(true)}
+              className="text-emerald-300 hover:text-white underline cursor-pointer shrink-0 ml-2 font-medium"
+            >
+              Legal &amp; Disclaimers
+            </button>
           </div>
         </aside>
 
@@ -220,6 +227,9 @@ export const AppContent: React.FC = () => {
           />
         </section>
       </main>
+
+      {/* Retail & Trademark Legal Disclaimer Modal */}
+      <LegalDisclaimerModal isOpen={isLegalModalOpen} onClose={() => setIsLegalModalOpen(false)} />
     </div>
   );
 };

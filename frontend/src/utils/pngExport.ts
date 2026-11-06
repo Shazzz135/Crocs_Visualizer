@@ -201,9 +201,7 @@ export async function exportShoeCanvasToPng({
   drawWatermark(ctx, canvasWidth, canvasHeight, scale);
 
   const dataUrl = canvas.toDataURL('image/png');
-  const safeName =
-    fileName ??
-    `crocs-custom-${color.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.png`;
+  const safeName = fileName ?? 'My_Crocs.png';
 
   const link = document.createElement('a');
   link.download = safeName;

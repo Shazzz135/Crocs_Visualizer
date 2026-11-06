@@ -116,7 +116,7 @@ test.describe('Crocs Customizer - Desktop E2E Suite', () => {
 
     const download = await downloadPromise;
     if (download) {
-      expect(download.suggestedFilename()).toMatch(/\.png$/i);
+      expect(download.suggestedFilename()).toBe('My_Crocs.png');
     }
   });
 

@@ -4,73 +4,125 @@ export type DrawerPosition = 'collapsed' | 'mid' | 'expanded';
 
 interface UseMobileDrawerDragReturn {
   position: DrawerPosition;
-  dragHeightPx: number | null;
+  drawerRef: React.RefObject<HTMLElement | null>;
   isDragging: boolean;
-  drawerStyle: React.CSSProperties;
   drawerClass: string;
-  handleTouchStart: (e: React.TouchEvent | React.PointerEvent) => void;
-  handleTouchMove: (e: React.TouchEvent | React.PointerEvent) => void;
-  handleTouchEnd: () => void;
+  handlePointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
+  handlePointerMove: (e: React.PointerEvent<HTMLDivElement>) => void;
+  handlePointerUp: (e: React.PointerEvent<HTMLDivElement>) => void;
+  handleClick: (e: React.MouseEvent) => void;
   toggleDrawer: () => void;
   setPosition: (pos: DrawerPosition) => void;
 }
 
 export function useMobileDrawerDrag(): UseMobileDrawerDragReturn {
   const [position, setPosition] = useState<DrawerPosition>('mid');
-  const [dragHeightPx, setDragHeightPx] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const drawerRef = useRef<HTMLElement | null>(null);
 
   const startYRef = useRef<number>(0);
   const startHeightRef = useRef<number>(0);
+  const pointerIdRef = useRef<number | null>(null);
+  const hasMovedRef = useRef<boolean>(false);
 
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent | React.PointerEvent) => {
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      startYRef.current = clientY;
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      e.stopPropagation();
 
-      const vh = window.innerHeight;
-      const curH =
-        position === 'expanded' ? vh * 0.92 : position === 'mid' ? vh * 0.55 : 64;
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // Fallback if capture not available
+      }
 
-      startHeightRef.current = curH;
+      pointerIdRef.current = e.pointerId;
+      hasMovedRef.current = false;
+      startYRef.current = e.clientY;
+
+      const currentHeight = drawerRef.current
+        ? drawerRef.current.getBoundingClientRect().height
+        : position === 'expanded'
+        ? window.innerHeight * 0.90
+        : position === 'mid'
+        ? window.innerHeight * 0.52
+        : 64;
+
+      startHeightRef.current = currentHeight;
       setIsDragging(true);
     },
     [position]
   );
 
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent | React.PointerEvent) => {
-      if (!isDragging) return;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      const deltaY = startYRef.current - clientY;
-      const newHeight = Math.max(
-        64,
-        Math.min(window.innerHeight * 0.94, startHeightRef.current + deltaY)
-      );
-      setDragHeightPx(newHeight);
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (pointerIdRef.current !== e.pointerId || !isDragging) return;
+      e.stopPropagation();
+
+      const deltaY = startYRef.current - e.clientY;
+      if (Math.abs(deltaY) > 5) {
+        hasMovedRef.current = true;
+      }
+
+      const minH = 64;
+      const maxH = window.innerHeight * 0.90;
+      const newHeight = Math.max(minH, Math.min(maxH, startHeightRef.current + deltaY));
+
+      if (drawerRef.current) {
+        drawerRef.current.style.height = `${newHeight}px`;
+        drawerRef.current.style.transition = 'none';
+      }
     },
     [isDragging]
   );
 
-  const handleTouchEnd = useCallback(() => {
-    if (!isDragging) return;
-    setIsDragging(false);
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (pointerIdRef.current !== e.pointerId) return;
+      e.stopPropagation();
 
-    if (dragHeightPx !== null) {
-      const vh = window.innerHeight;
-      const collapsedThreshold = vh * 0.25;
-      const expandedThreshold = vh * 0.75;
-
-      if (dragHeightPx < collapsedThreshold) {
-        setPosition('collapsed');
-      } else if (dragHeightPx > expandedThreshold) {
-        setPosition('expanded');
-      } else {
-        setPosition('mid');
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        // Fallback if release not available
       }
-      setDragHeightPx(null);
+
+      pointerIdRef.current = null;
+      setIsDragging(false);
+
+      if (drawerRef.current) {
+        const currentHeight = drawerRef.current.getBoundingClientRect().height;
+        const vh = window.innerHeight;
+        const collapsedThreshold = vh * 0.28;
+        const expandedThreshold = vh * 0.72;
+
+        const targetPos: DrawerPosition =
+          currentHeight < collapsedThreshold
+            ? 'collapsed'
+            : currentHeight > expandedThreshold
+            ? 'expanded'
+            : 'mid';
+
+        drawerRef.current.style.height = '';
+        drawerRef.current.style.transition = '';
+        setPosition(targetPos);
+      }
+    },
+    []
+  );
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    if (hasMovedRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
     }
-  }, [dragHeightPx, isDragging]);
+    setPosition((prev) => {
+      if (prev === 'collapsed') return 'mid';
+      if (prev === 'mid') return 'expanded';
+      return 'collapsed';
+    });
+  }, []);
 
   const toggleDrawer = useCallback(() => {
     setPosition((prev) => {
@@ -80,27 +132,22 @@ export function useMobileDrawerDrag(): UseMobileDrawerDragReturn {
     });
   }, []);
 
-  const drawerStyle: React.CSSProperties =
-    dragHeightPx !== null ? { height: `${dragHeightPx}px`, transition: 'none' } : {};
-
   const drawerClass =
-    dragHeightPx !== null
-      ? 'fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
-      : position === 'expanded'
-      ? 'h-[92dvh] fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
+    position === 'expanded'
+      ? 'h-[90dvh] fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
       : position === 'collapsed'
       ? 'h-16 fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
-      : 'h-[56dvh] md:h-full';
+      : 'h-[52dvh] fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto';
 
   return {
     position,
-    dragHeightPx,
+    drawerRef,
     isDragging,
-    drawerStyle,
     drawerClass,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handleClick,
     toggleDrawer,
     setPosition,
   };

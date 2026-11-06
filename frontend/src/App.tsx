@@ -44,13 +44,13 @@ export const AppContent: React.FC = () => {
 
   const {
     position: drawerPos,
+    drawerRef,
     isDragging,
-    drawerStyle,
     drawerClass,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
-    toggleDrawer,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handleClick,
   } = useMobileDrawerDrag();
 
   const handleSelectCharm = (charm: JibbitzItem) => {
@@ -93,19 +93,20 @@ export const AppContent: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen w-full max-w-full overflow-hidden bg-[#031811] text-emerald-50 font-sans">
-      <main className="flex-1 flex flex-col-reverse md:flex-row relative overflow-hidden w-full h-full">
+      <main className="flex-1 flex flex-col md:flex-row relative overflow-hidden w-full h-full">
+        {/* Mobile bottom drawer & Desktop left sidebar */}
         <aside
+          ref={drawerRef}
           aria-label="Customizer editing workspace"
-          style={drawerStyle}
-          className={`w-full md:w-[420px] lg:w-[450px] border-t md:border-t-0 md:border-r border-emerald-900/60 bg-[#06241a]/95 p-3 sm:p-4 flex flex-col gap-2.5 backdrop-blur-md shrink-0 z-20 shadow-2xl transition-all duration-200 ${drawerClass}`}
+          className={`w-full md:w-[420px] lg:w-[450px] border-t md:border-t-0 md:border-r border-emerald-900/60 bg-[#06241a]/95 p-3 sm:p-4 flex flex-col gap-2.5 backdrop-blur-md shrink-0 z-20 shadow-2xl transition-[height] duration-250 ease-out ${drawerClass}`}
         >
           <MobileDrawerHandle
             drawerPos={drawerPos}
             isDragging={isDragging}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onToggle={toggleDrawer}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onClick={handleClick}
           />
 
           <CustomizerHeader
@@ -191,7 +192,13 @@ export const AppContent: React.FC = () => {
         {/* Right Preview Window (2D Interactive Shoe Canvas) */}
         <section
           aria-label="Interactive 2D Crocs preview canvas"
-          className="flex-1 flex flex-col items-center justify-center relative w-full h-full overflow-hidden p-2 sm:p-4 bg-gradient-to-b from-[#041d15] to-[#02130e] min-h-0"
+          className={`flex-1 flex flex-col items-center justify-center relative w-full h-full overflow-hidden p-2 sm:p-4 bg-gradient-to-b from-[#041d15] to-[#02130e] min-h-0 md:pb-4 transition-[padding] duration-250 ease-out ${
+            drawerPos === 'collapsed'
+              ? 'pb-20'
+              : drawerPos === 'expanded'
+              ? 'pb-[90dvh]'
+              : 'pb-[52dvh]'
+          }`}
         >
           <ShoeCanvas
             size={size}

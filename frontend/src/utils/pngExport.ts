@@ -1,6 +1,6 @@
 import type { CrocColor, CrocSize, PlacedJibbitz } from '@crocs/shared';
 import { EXPORT_WATERMARK_LINES } from '@crocs/shared';
-import { SHOE_HOLES_BY_SIZE } from '../components/canvas/shoeHoleConfig.js';
+import { SHOE_DISPLAY_SIZES, SHOE_HOLES_BY_SIZE } from '../components/canvas/shoeHoleConfig.js';
 import { SHOE_VIEWBOX } from '../components/canvas/crocsSvgData.js';
 
 export interface PngExportOptions {
@@ -42,11 +42,15 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 function svgToImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
   const clone = svg.cloneNode(true) as SVGSVGElement;
-  // Strip interactive elements/overlays before snapshotting
-  const interactives = clone.querySelectorAll(
-    '[data-charm-item="true"], [data-shoe-interactive="true"]'
+  // Remove placed charm overlays and rotation dials, but PRESERVE all vent holes
+  const charmOverlays = clone.querySelectorAll(
+    '[data-charm-item="true"], [data-rotation-dial="true"]'
   );
-  interactives.forEach((el) => el.remove());
+  charmOverlays.forEach((el) => el.remove());
+
+  // Remove active snap pulse/glow rings so holes appear clean and static
+  const snapGlows = clone.querySelectorAll('.animate-pulse');
+  snapGlows.forEach((el) => el.remove());
 
   const svgXml = new XMLSerializer().serializeToString(clone);
   const blob = new Blob([svgXml], { type: 'image/svg+xml;charset=utf-8' });
@@ -106,8 +110,11 @@ export async function exportShoeCanvasToPng({
   scale = 2,
   fileName,
 }: PngExportOptions): Promise<string> {
+  const displaySpec = SHOE_DISPLAY_SIZES[size] ?? SHOE_DISPLAY_SIZES.adult;
+  const heightRatio = displaySpec.height / 472;
+
   const shoeW = SHOE_VIEWBOX.width;
-  const shoeH = SHOE_VIEWBOX.height;
+  const shoeH = SHOE_VIEWBOX.height * heightRatio;
   const gap = 36;
   const pairWidth = shoeW * 2 + gap;
 
@@ -141,7 +148,7 @@ export async function exportShoeCanvasToPng({
   const subtitle = `${color.name.toUpperCase()} CLASSIC CLOG • ${size.toUpperCase()} • ${placements.length} JIBBITZ™`;
   ctx.fillText(subtitle, canvasWidth / 2, 74 * scale);
 
-  // Render Left & Right Shoe SVGs
+  // Render Left & Right Shoe SVGs (retaining all vent holes)
   const shoeOriginY = headerH * scale;
   const leftShoeX = ((canvasWidth / scale - pairWidth) / 2) * scale;
   const rightShoeX = leftShoeX + (shoeW + gap) * scale;
@@ -155,7 +162,7 @@ export async function exportShoeCanvasToPng({
     ctx.drawImage(rightImg, rightShoeX, shoeOriginY, shoeW * scale, shoeH * scale);
   }
 
-  // Render Placed Jibbitz Charms
+  // Render Placed Jibbitz Charms directly over their vent holes
   const sizeHoles = SHOE_HOLES_BY_SIZE[size] ?? SHOE_HOLES_BY_SIZE.adult;
   const charmSize = 72 * scale;
   const halfCharm = charmSize / 2;
@@ -168,8 +175,8 @@ export async function exportShoeCanvasToPng({
 
     const shoeOriginX = isLeft ? leftShoeX : rightShoeX;
     const holeX = isLeft ? holeCfg.x : SHOE_VIEWBOX.width - holeCfg.x;
-    const canvasHoleX = shoeOriginX + holeX * scale;
-    const canvasHoleY = shoeOriginY + holeCfg.y * scale;
+    const canvasHoleX = shoeOriginX + (holeX / SHOE_VIEWBOX.width) * (shoeW * scale);
+    const canvasHoleY = shoeOriginY + (holeCfg.y / SHOE_VIEWBOX.height) * (shoeH * scale);
 
     const imgUrl = p.charm?.imageUrl ?? `/catalog/images/${p.jibbitId}.png`;
     try {

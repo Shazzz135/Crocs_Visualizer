@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { JibbitzItem } from '@crocs/shared';
 import type { ScoredJibbitzItem } from '@crocs/shared';
 
@@ -6,24 +6,13 @@ interface CharmGridProps {
   items: (JibbitzItem | ScoredJibbitzItem)[];
   selectedCharmId?: string;
   onSelectCharm: (charm: JibbitzItem) => void;
-  pageSize?: number;
 }
 
 export const CharmGrid: React.FC<CharmGridProps> = ({
   items,
   selectedCharmId,
   onSelectCharm,
-  pageSize = 36,
 }) => {
-  const [visibleCount, setVisibleCount] = useState<number>(pageSize);
-
-  const visibleItems = items.slice(0, visibleCount);
-  const hasMore = visibleCount < items.length;
-
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => Math.min(prev + pageSize, items.length));
-  };
-
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800/60 my-auto">
@@ -40,25 +29,28 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
             d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <p className="text-xs font-semibold text-slate-400">No matching Jibbitz found</p>
+        <p className="text-xs font-semibold text-slate-400">
+          No matching Jibbitz found
+        </p>
         <p className="text-[11px] text-slate-500 mt-1 max-w-xs">
-          Try a different keyword or semantic term like &ldquo;cute puppy&rdquo;, &ldquo;gold alphabet&rdquo;, or &ldquo;retro music&rdquo;.
+          Try searching for &ldquo;cute puppy&rdquo;, &ldquo;gold alphabet&rdquo;, or &ldquo;retro music&rdquo;.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3 min-h-0 flex-1">
-      {/* Scrollable Thumbnail Grid */}
+    <div className="flex flex-col gap-2 min-h-0 flex-1">
+      {/* Scrollable Grid with All Charms Always Loaded */}
       <div
         tabIndex={0}
         aria-label="Jibbitz charms catalog grid"
-        className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-2 overflow-y-auto p-1.5 bg-slate-950/60 rounded-xl border border-slate-800/80 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent flex-1 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
+        className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-2 overflow-y-auto p-2 bg-slate-950/60 rounded-xl border border-slate-800/80 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent flex-1 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
       >
-        {visibleItems.map((item) => {
+        {items.map((item) => {
           const isSelected = selectedCharmId === item.id;
-          const score = 'score' in item ? (item as ScoredJibbitzItem).score : undefined;
+          const score =
+            'score' in item ? (item as ScoredJibbitzItem).score : undefined;
 
           return (
             <button
@@ -72,7 +64,7 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
                   : 'border-slate-800/90 hover:border-slate-700 bg-slate-900/50 hover:bg-slate-900/90'
               }`}
             >
-              {/* Thumbnail with crisp transparent background & normalized aspect ratio */}
+              {/* Scaled thumbnail with transparent crisp display */}
               <div className="w-10 h-10 flex items-center justify-center relative">
                 <img
                   src={item.imageUrl}
@@ -98,20 +90,6 @@ export const CharmGrid: React.FC<CharmGridProps> = ({
           );
         })}
       </div>
-
-      {/* Pagination Controls */}
-      {hasMore && (
-        <button
-          type="button"
-          onClick={handleLoadMore}
-          className="w-full py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-900/80 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors flex items-center justify-center gap-1.5 shrink-0"
-        >
-          <span>Load More Charms</span>
-          <span className="text-[10px] text-slate-400">
-            ({visibleCount} of {items.length})
-          </span>
-        </button>
-      )}
     </div>
   );
 };

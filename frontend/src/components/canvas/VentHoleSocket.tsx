@@ -28,19 +28,25 @@ export const VentHoleSocket: React.FC<VentHoleSocketProps> = ({
     <g
       className="cursor-pointer transition-transform duration-150"
       transform={`translate(${position.x}, ${position.y})`}
-      onClick={() => onSelect?.(hole)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.(hole);
+      }}
       role="button"
       tabIndex={0}
       aria-label={`Vent hole ${hole.id}${isOccupied ? ' (occupied)' : ' (empty)'}`}
     >
+      {/* Generous hit target for click & touch (r=24) */}
+      <circle r={radius + 13} fill="transparent" pointerEvents="all" />
+
       {/* Target glow ring when snapping or hovered */}
       {(isHovered || isSnapTarget) && (
         <circle
-          r={radius + 5.5}
-          fill="none"
-          stroke="#38bdf8"
-          strokeWidth="2.4"
-          className="animate-pulse opacity-95"
+          r={radius + 6}
+          fill="rgba(16, 185, 129, 0.25)"
+          stroke="#10b981"
+          strokeWidth="2.5"
+          className="animate-pulse"
         />
       )}
 
@@ -59,7 +65,7 @@ export const VentHoleSocket: React.FC<VentHoleSocketProps> = ({
         fill={wallColor}
       />
 
-      {/* Deep recessed interior hole cavity (shifted slightly down for 3D wall thickness) */}
+      {/* Deep recessed interior hole cavity */}
       <circle
         cx={0.3}
         cy={0.9}

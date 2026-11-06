@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DEFAULT_CROC_COLORS, type VentHole } from '@crocs/shared';
+import { DEFAULT_CROC_COLORS, type HoleId, type JibbitzItem, type VentHole } from '@crocs/shared';
 import { ShoeCanvas } from './components/canvas/ShoeCanvas.js';
 import { ShoeColorTab } from './components/controls/ShoeColorTab.js';
 import { JibbitzDiscoveryDrawer } from './components/discovery/JibbitzDiscoveryDrawer.js';
@@ -17,6 +17,7 @@ export const AppContent: React.FC = () => {
   const occupiedHoleIds = customizer?.occupiedHoleIds ?? new Set<string>();
   const activeCharmToPlace = customizer?.activeCharmToPlace ?? null;
   const selectedPlacementId = customizer?.selectedPlacementId ?? null;
+
   const {
     setSize,
     setColor,
@@ -24,8 +25,10 @@ export const AppContent: React.FC = () => {
     setActiveCharmToPlace,
     setSelectedPlacementId,
     placeCharm,
+    moveCharm,
     updateRotation,
     handlePlacementClick,
+    findFirstAvailableHole,
   } = customizer ?? {};
 
   const [activeTab, setActiveTab] = useState<CustomizerTab>('charms');
@@ -39,10 +42,29 @@ export const AppContent: React.FC = () => {
     toggleDrawer,
   } = useMobileDrawerDrag();
 
+  // Click on charm in catalog automatically adds to an empty hole
+  const handleSelectCharm = (charm: JibbitzItem) => {
+    const emptyHoleId = findFirstAvailableHole?.();
+    if (emptyHoleId) {
+      placeCharm?.(charm, emptyHoleId);
+    } else {
+      setActiveCharmToPlace?.(charm);
+    }
+  };
+
   const handleHoleClick = (hole: VentHole) => {
     setActiveHole?.(hole);
     if (activeCharmToPlace) {
       placeCharm?.(activeCharmToPlace, hole.id);
+    }
+  };
+
+  const handleDropCharm = (charm: JibbitzItem, targetHoleId: HoleId, sourceHoleId?: HoleId | null) => {
+    if (sourceHoleId) {
+      if (sourceHoleId === targetHoleId) return;
+      moveCharm?.(sourceHoleId, targetHoleId);
+    } else {
+      placeCharm?.(charm, targetHoleId);
     }
   };
 
@@ -73,80 +95,66 @@ export const AppContent: React.FC = () => {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            onPointerDown={handleTouchStart}
-            onPointerMove={handleTouchMove}
-            onPointerUp={handleTouchEnd}
-            className="md:hidden flex flex-col items-center -mt-1 pb-1 cursor-grab active:cursor-grabbing select-none touch-none"
+            onClick={toggleDrawer}
+            className="md:hidden flex flex-col items-center justify-center py-1 cursor-grab active:cursor-grabbing select-none shrink-0"
           >
-            <div
-              className={`w-14 h-1.5 rounded-full transition-colors ${
-                isDragging ? 'bg-emerald-400 scale-110' : 'bg-emerald-800'
-              }`}
-            />
-            <span
-              onClick={toggleDrawer}
-              className="text-[9px] text-emerald-400/80 mt-1 font-medium cursor-pointer"
-            >
-              {drawerPos === 'expanded'
-                ? 'Drag down to collapse'
-                : drawerPos === 'collapsed'
-                ? 'Drag up or tap to expand'
-                : 'Drag all the way up / down'}
+            <div className={`w-12 h-1.5 rounded-full transition-colors ${isDragging ? 'bg-emerald-400' : 'bg-emerald-700/80'}`} />
+            <span className="text-[10px] text-emerald-400/80 font-medium mt-0.5">
+              {drawerPos === 'collapsed' ? 'Drag up for charms' : drawerPos === 'expanded' ? 'Drag down for shoe preview' : 'Drag up or down'}
             </span>
           </div>
 
-          {/* Dynamic Compact Header Bar */}
-          <div className="flex items-center justify-between border-b border-emerald-900/60 pb-2.5 shrink-0">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 shrink-0 rounded-lg bg-emerald-500/20 border border-emerald-400 flex items-center justify-center font-black text-emerald-400 text-xs shadow-sm shadow-emerald-500/20">
-                CV
-              </div>
-              <div>
-                <h1 className="text-sm sm:text-base font-bold tracking-tight text-white leading-tight">
-                  Classic Crocs Visualizer
-                </h1>
-                <p className="text-[11px] text-emerald-400 font-medium">
-                  {color.name} • {size.toUpperCase()}
-                  {placements.length > 0 && ` • ${placements.length} charms`}
-                </p>
-              </div>
+          {/* Header Bar */}
+          <div className="flex items-center justify-between pb-1.5 border-b border-emerald-900/60 shrink-0">
+            <div>
+              <h1 className="text-sm sm:text-base font-bold text-white tracking-wide">CROCS CUSTOMIZER</h1>
+              <p className="text-[11px] text-emerald-400/80">Design your pair with authentic Jibbitz</p>
             </div>
+            <div className="flex items-center gap-1.5">
+              <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-full">
+                {size}
+              </span>
+            </div>
+          </div>
 
-            <div
-              role="tablist"
-              aria-label="Customizer tool modes"
-              className="flex p-0.5 bg-[#02130e]/95 rounded-lg border border-emerald-900/80 shadow-inner"
+          {/* Mode Switcher */}
+          <div
+            role="tablist"
+            aria-label="Customizer tool modes"
+            className="grid grid-cols-2 gap-1.5 p-1 bg-[#02130e] rounded-xl border border-emerald-900/70 shrink-0"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'charms'}
+              onClick={() => setActiveTab('charms')}
+              className={`flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                activeTab === 'charms'
+                  ? 'bg-emerald-600 text-white shadow-md'
+                  : 'text-emerald-300/80 hover:text-white hover:bg-emerald-950/60'
+              }`}
             >
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeTab === 'shoe'}
-                onClick={() => setActiveTab('shoe')}
-                className={`flex items-center gap-1 py-1 px-2.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                  activeTab === 'shoe'
-                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm shadow-emerald-500/30'
-                    : 'text-emerald-300/80 hover:text-white'
-                }`}
-              >
-                <span>👟</span>
-                <span>Shoe</span>
-              </button>
-
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeTab === 'charms'}
-                onClick={() => setActiveTab('charms')}
-                className={`flex items-center gap-1 py-1 px-2.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                  activeTab === 'charms'
-                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm shadow-emerald-500/30'
-                    : 'text-emerald-300/80 hover:text-white'
-                }`}
-              >
-                <span>✨</span>
-                <span>Charms</span>
-              </button>
-            </div>
+              <span>Charms</span>
+              {placements.length > 0 && (
+                <span className="w-4 h-4 rounded-full bg-emerald-400 text-emerald-950 text-[10px] font-bold flex items-center justify-center">
+                  {placements.length}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'shoe'}
+              onClick={() => setActiveTab('shoe')}
+              className={`flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                activeTab === 'shoe'
+                  ? 'bg-emerald-600 text-white shadow-md'
+                  : 'text-emerald-300/80 hover:text-white hover:bg-emerald-950/60'
+              }`}
+            >
+              <span className="w-2.5 h-2.5 rounded-full border border-white/40" style={{ backgroundColor: color.hex }} />
+              <span>Shoe Color</span>
+            </button>
           </div>
 
           {/* Active Placement Hint Banner */}
@@ -159,7 +167,7 @@ export const AppContent: React.FC = () => {
                   className="w-5 h-5 object-contain"
                 />
                 <span className="text-emerald-200 font-semibold truncate max-w-[200px]">
-                  Drag or click any empty hole to place &ldquo;{activeCharmToPlace.name}&rdquo;
+                  Placed on empty hole &bull; Drag to move
                 </span>
               </div>
               <button
@@ -167,7 +175,7 @@ export const AppContent: React.FC = () => {
                 onClick={() => setActiveCharmToPlace?.(null)}
                 className="text-[10px] text-emerald-400 hover:text-white px-1.5 py-0.5 rounded bg-emerald-900/80 cursor-pointer"
               >
-                Cancel
+                Dismiss
               </button>
             </div>
           )}
@@ -185,7 +193,7 @@ export const AppContent: React.FC = () => {
             ) : (
               <JibbitzDiscoveryDrawer
                 selectedCharmId={activeCharmToPlace?.id}
-                onSelectCharm={(charm) => setActiveCharmToPlace?.(charm)}
+                onSelectCharm={handleSelectCharm}
               />
             )}
           </div>
@@ -206,7 +214,7 @@ export const AppContent: React.FC = () => {
             onCharmClick={(instId) => handlePlacementClick?.(instId)}
             onRotateCharm={(instId, deg) => updateRotation?.(instId, deg)}
             onCanvasClick={() => setSelectedPlacementId?.(null)}
-            onDropCharm={(charm, holeId) => placeCharm?.(charm, holeId)}
+            onDropCharm={handleDropCharm}
           />
         </section>
       </main>

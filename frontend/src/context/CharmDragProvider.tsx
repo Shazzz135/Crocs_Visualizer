@@ -6,6 +6,8 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     charm: null,
+    sourceHoleId: null,
+    sourceInstanceId: null,
     pointerPos: null,
     activeSnapHoleId: null,
   });
@@ -15,54 +17,86 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     stateRef.current = dragState;
   }, [dragState]);
 
-  const startDrag = useCallback((charm: JibbitzItem, startPos: { x: number; y: number }) => {
-    setDragState({
-      isDragging: true,
-      charm,
-      pointerPos: startPos,
-      activeSnapHoleId: null,
-    });
-  }, []);
+  const startDrag = useCallback(
+    (
+      charm: JibbitzItem,
+      startPos: { x: number; y: number },
+      sourceHoleId?: HoleId | null,
+      sourceInstanceId?: string | null
+    ) => {
+      const nextState: DragState = {
+        isDragging: true,
+        charm,
+        sourceHoleId: sourceHoleId ?? null,
+        sourceInstanceId: sourceInstanceId ?? null,
+        pointerPos: startPos,
+        activeSnapHoleId: null,
+      };
+      stateRef.current = nextState;
+      setDragState(nextState);
+    },
+    []
+  );
 
   const updateDragPosition = useCallback((pos: { x: number; y: number }, snapHoleId?: HoleId | null) => {
     setDragState((prev) => {
       if (!prev.isDragging) return prev;
-      return {
+      const next = {
         ...prev,
         pointerPos: pos,
         activeSnapHoleId: snapHoleId !== undefined ? snapHoleId : prev.activeSnapHoleId,
       };
+      stateRef.current = next;
+      return next;
     });
   }, []);
 
-  const endDrag = useCallback(() => {
+  const endDrag = useCallback((overrideHoleId?: HoleId | null) => {
     const current = stateRef.current;
-    if (current.isDragging && current.charm && current.activeSnapHoleId) {
-      const result = { charm: current.charm, holeId: current.activeSnapHoleId };
-      setDragState({
+    const targetHoleId = overrideHoleId !== undefined ? overrideHoleId : current.activeSnapHoleId;
+    if (current.isDragging && current.charm && targetHoleId) {
+      const result = {
+        charm: current.charm,
+        holeId: targetHoleId,
+        sourceHoleId: current.sourceHoleId,
+        sourceInstanceId: current.sourceInstanceId,
+      };
+      const resetState: DragState = {
         isDragging: false,
         charm: null,
+        sourceHoleId: null,
+        sourceInstanceId: null,
         pointerPos: null,
         activeSnapHoleId: null,
-      });
+      };
+      stateRef.current = resetState;
+      setDragState(resetState);
       return result;
     }
-    setDragState({
+    const resetState: DragState = {
       isDragging: false,
       charm: null,
+      sourceHoleId: null,
+      sourceInstanceId: null,
       pointerPos: null,
       activeSnapHoleId: null,
-    });
+    };
+    stateRef.current = resetState;
+    setDragState(resetState);
     return null;
   }, []);
 
   const cancelDrag = useCallback(() => {
-    setDragState({
+    const resetState: DragState = {
       isDragging: false,
       charm: null,
+      sourceHoleId: null,
+      sourceInstanceId: null,
       pointerPos: null,
       activeSnapHoleId: null,
-    });
+    };
+    stateRef.current = resetState;
+    setDragState(resetState);
   }, []);
 
   return (
@@ -77,28 +111,22 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     >
       {children}
 
-      {/* Floating Drag Overlay following Cursor / Finger */}
+      {/* Floating Drag Overlay: Image on cursor with NO border and NO background */}
       {dragState.isDragging && dragState.charm && dragState.pointerPos && (
         <div
-          className="fixed pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2 transition-transform duration-75 select-none"
+          className="fixed pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2 select-none"
           style={{
             left: `${dragState.pointerPos.x}px`,
             top: `${dragState.pointerPos.y}px`,
+            width: '44px',
+            height: '44px',
           }}
         >
-          <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center p-1 transition-all ${
-              dragState.activeSnapHoleId
-                ? 'scale-125 bg-emerald-500/30 ring-2 ring-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.8)]'
-                : 'scale-110 drop-shadow-2xl'
-            }`}
-          >
-            <img
-              src={dragState.charm.imageUrl}
-              alt={dragState.charm.name}
-              className="w-full h-full object-contain filter drop-shadow(0 8px 12px rgba(0,0,0,0.6))"
-            />
-          </div>
+          <img
+            src={dragState.charm.imageUrl}
+            alt={dragState.charm.name}
+            className="w-full h-full object-contain filter drop-shadow(0 6px 12px rgba(0,0,0,0.45)) pointer-events-none"
+          />
         </div>
       )}
     </CharmDragContext.Provider>

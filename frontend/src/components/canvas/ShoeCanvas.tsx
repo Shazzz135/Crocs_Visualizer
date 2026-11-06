@@ -2,9 +2,9 @@ import type { CrocColor, CrocSize, HoleId, JibbitzItem, PlacedJibbitz, VentHole 
 import React, { useRef, useEffect } from 'react';
 import { useCanvasZoom } from '../../hooks/useCanvasZoom.js';
 import { SHOE_DISPLAY_SIZES, SHOE_HOLES_BY_SIZE } from './shoeHoleConfig.js';
-import { SHOE_VIEWBOX } from './crocsSvgData.js';
 import { SingleShoeSvg } from './SingleShoeSvg.js';
 import { useCharmDrag } from '../../context/useCharmDrag.js';
+import { findHoleOnShoe } from './shoeSnapHelper.js';
 
 interface ShoeCanvasProps {
   size: CrocSize;
@@ -17,7 +17,7 @@ interface ShoeCanvasProps {
   onCharmClick?: (instanceId: string) => void;
   onRotateCharm?: (instanceId: string, deg: number) => void;
   onCanvasClick?: () => void;
-  onDropCharm?: (charm: JibbitzItem, holeId: HoleId) => void;
+  onDropCharm?: (charm: JibbitzItem, holeId: HoleId, sourceHoleId?: HoleId | null) => void;
 }
 
 export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
@@ -59,61 +59,45 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
     handleTouchEnd,
   } = useCanvasZoom({ pairWidth, pairHeight });
 
-  // Handle global drag tracking over the shoes
+  // Real-time drag tracking & magnetic hole snapping over shoe canvas
   useEffect(() => {
     if (!dragState.isDragging) return;
 
     const sizeHoles = SHOE_HOLES_BY_SIZE[size] ?? SHOE_HOLES_BY_SIZE.adult;
 
-    const findNearestHole = (svg: SVGSVGElement | null, isLeft: boolean, clientX: number, clientY: number): HoleId | null => {
-      if (!svg) return null;
-      const rect = svg.getBoundingClientRect();
-      if (
-        clientX < rect.left - 40 ||
-        clientX > rect.right + 40 ||
-        clientY < rect.top - 40 ||
-        clientY > rect.bottom + 40
-      ) {
-        return null;
-      }
+    const resolveNearestHole = (clientX: number, clientY: number): HoleId | null => {
+      const leftMatch = findHoleOnShoe({
+        svg: leftSvgRef.current,
+        isLeft: true,
+        clientX,
+        clientY,
+        sizeHoles,
+        occupiedHoleIds,
+        sourceHoleId: dragState.sourceHoleId,
+      });
+      if (leftMatch) return leftMatch;
 
-      const pt = svg.createSVGPoint();
-      pt.x = clientX;
-      pt.y = clientY;
-      const ctm = svg.getScreenCTM();
-      if (!ctm) return null;
-      const svgPt = pt.matrixTransform(ctm.inverse());
-
-      const prefix = isLeft ? 'HL' : 'HR';
-      let nearestHoleId: HoleId | null = null;
-      let minDist = 34; // Snapping collision threshold (in SVG coordinate space)
-
-      for (const h of sizeHoles) {
-        const hId = `${prefix}-${String(h.index).padStart(2, '0')}` as HoleId;
-        if (occupiedHoleIds.has(hId)) continue;
-
-        const hx = isLeft ? h.x : SHOE_VIEWBOX.width - h.x;
-        const dist = Math.hypot(svgPt.x - hx, svgPt.y - h.y);
-        if (dist < minDist) {
-          minDist = dist;
-          nearestHoleId = hId;
-        }
-      }
-      return nearestHoleId;
+      return findHoleOnShoe({
+        svg: rightSvgRef.current,
+        isLeft: false,
+        clientX,
+        clientY,
+        sizeHoles,
+        occupiedHoleIds,
+        sourceHoleId: dragState.sourceHoleId,
+      });
     };
 
     const handleWindowPointerMove = (e: PointerEvent) => {
-      const leftMatch = findNearestHole(leftSvgRef.current, true, e.clientX, e.clientY);
-      const rightMatch = leftMatch ? null : findNearestHole(rightSvgRef.current, false, e.clientX, e.clientY);
-      const matchedHoleId = leftMatch || rightMatch;
-
+      const matchedHoleId = resolveNearestHole(e.clientX, e.clientY);
       updateDragPosition({ x: e.clientX, y: e.clientY }, matchedHoleId);
     };
 
-    const handleWindowPointerUp = () => {
-      const dropped = endDrag();
+    const handleWindowPointerUp = (e: PointerEvent) => {
+      const finalHoleId = resolveNearestHole(e.clientX, e.clientY);
+      const dropped = endDrag(finalHoleId);
       if (dropped && onDropCharm) {
-        onDropCharm(dropped.charm, dropped.holeId);
+        onDropCharm(dropped.charm, dropped.holeId, dropped.sourceHoleId);
       }
     };
 
@@ -126,7 +110,7 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
       window.removeEventListener('pointerup', handleWindowPointerUp);
       window.removeEventListener('pointercancel', handleWindowPointerUp);
     };
-  }, [dragState.isDragging, endDrag, occupiedHoleIds, onDropCharm, size, updateDragPosition]);
+  }, [dragState.isDragging, dragState.sourceHoleId, endDrag, occupiedHoleIds, onDropCharm, size, updateDragPosition]);
 
   const handleContainerClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).tagName === 'DIV' || (e.target as HTMLElement).tagName === 'svg') {
@@ -151,10 +135,10 @@ export const ShoeCanvas: React.FC<ShoeCanvasProps> = ({
         isPanning ? 'cursor-grabbing' : 'cursor-grab'
       }`}
     >
-      {/* Floating Zoom Controls */}
+      {/* Zoom HUD */}
       <div
         data-zoom-hud="true"
-        className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex items-center gap-1 bg-[#06241a]/95 border border-emerald-900/80 rounded-lg px-2 py-1 backdrop-blur-md shadow-xl cursor-default"
+        className="absolute top-3 right-3 z-30 flex items-center gap-1 bg-[#06241a]/90 backdrop-blur-md border border-emerald-800/80 rounded-lg p-1 shadow-lg"
       >
         <button
           type="button"

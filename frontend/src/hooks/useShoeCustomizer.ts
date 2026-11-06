@@ -10,6 +10,7 @@ import {
   type VentHole,
 } from '@crocs/shared';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { SHOE_HOLES_BY_SIZE } from '../components/canvas/shoeHoleConfig.js';
 
 export interface ShoeCustomizerState {
   size: CrocSize;
@@ -25,9 +26,11 @@ export interface ShoeCustomizerState {
   setActiveCharmToPlace: (charm: JibbitzItem | null) => void;
   setSelectedPlacementId: (id: string | null) => void;
   placeCharm: (charm: JibbitzItem, holeId: HoleId, rotationDeg?: number) => void;
+  moveCharm: (fromHoleId: HoleId, toHoleId: HoleId) => void;
   updateRotation: (instanceId: string, rotationDeg: number) => void;
   removePlacement: (instanceId: string) => void;
   handlePlacementClick: (instanceId: string) => void;
+  findFirstAvailableHole: () => HoleId | null;
   resetCustomizer: () => void;
 }
 
@@ -39,7 +42,6 @@ export function useShoeCustomizer(): ShoeCustomizerState {
   const [activeCharmToPlace, setActiveCharmToPlace] = useState<JibbitzItem | null>(null);
   const [selectedPlacementId, setSelectedPlacementId] = useState<string | null>(null);
 
-  // 3-click deletion state tracker
   const clickTrackerRef = useRef<ClickTrackerState>({
     targetId: null,
     clickCount: 0,
@@ -50,25 +52,46 @@ export function useShoeCustomizer(): ShoeCustomizerState {
     return new Set(placements.map((p) => p.holeId));
   }, [placements]);
 
-  const placeCharm = useCallback(
-    (charm: JibbitzItem, holeId: HoleId, rotationDeg = 0) => {
-      setPlacements((prev) => {
-        // Remove any charm already on this hole
-        const filtered = prev.filter((p) => p.holeId !== holeId);
-        const newPlacement: PlacedJibbitz = {
-          instanceId: `inst-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-          jibbitId: charm.id,
-          holeId,
-          rotationDeg,
-          placedAt: Date.now(),
-          charm,
-        };
-        return [...filtered, newPlacement];
-      });
-      setActiveCharmToPlace(null);
-    },
-    []
-  );
+  const findFirstAvailableHole = useCallback((): HoleId | null => {
+    const sizeHoles = SHOE_HOLES_BY_SIZE[size] ?? SHOE_HOLES_BY_SIZE.adult;
+    for (const h of sizeHoles) {
+      const id = `HL-${String(h.index).padStart(2, '0')}` as HoleId;
+      if (!occupiedHoleIds.has(id)) return id;
+    }
+    for (const h of sizeHoles) {
+      const id = `HR-${String(h.index).padStart(2, '0')}` as HoleId;
+      if (!occupiedHoleIds.has(id)) return id;
+    }
+    return null;
+  }, [occupiedHoleIds, size]);
+
+  const placeCharm = useCallback((charm: JibbitzItem, holeId: HoleId, rotationDeg = 0) => {
+    const newInstId = `inst-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    setPlacements((prev) => {
+      const filtered = prev.filter((p) => p.holeId !== holeId);
+      const newPlacement: PlacedJibbitz = {
+        instanceId: newInstId,
+        jibbitId: charm.id,
+        holeId,
+        rotationDeg,
+        placedAt: Date.now(),
+        charm,
+      };
+      return [...filtered, newPlacement];
+    });
+    setSelectedPlacementId(newInstId);
+    setActiveCharmToPlace(null);
+  }, []);
+
+  const moveCharm = useCallback((fromHoleId: HoleId, toHoleId: HoleId) => {
+    if (fromHoleId === toHoleId) return;
+    setPlacements((prev) => {
+      const existing = prev.find((p) => p.holeId === fromHoleId);
+      if (!existing) return prev;
+      const filtered = prev.filter((p) => p.holeId !== toHoleId && p.holeId !== fromHoleId);
+      return [...filtered, { ...existing, holeId: toHoleId, placedAt: Date.now() }];
+    });
+  }, []);
 
   const updateRotation = useCallback((instanceId: string, rotationDeg: number) => {
     setPlacements((prev) =>
@@ -81,7 +104,6 @@ export function useShoeCustomizer(): ShoeCustomizerState {
     setSelectedPlacementId((prev) => (prev === instanceId ? null : prev));
   }, []);
 
-  // 3-click deletion interaction: click 1 selects, double-click while selected deletes
   const handlePlacementClick = useCallback(
     (instanceId: string) => {
       const now = Date.now();
@@ -120,9 +142,11 @@ export function useShoeCustomizer(): ShoeCustomizerState {
     setActiveCharmToPlace,
     setSelectedPlacementId,
     placeCharm,
+    moveCharm,
     updateRotation,
     removePlacement,
     handlePlacementClick,
+    findFirstAvailableHole,
     resetCustomizer,
   };
 }

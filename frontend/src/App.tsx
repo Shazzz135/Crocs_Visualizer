@@ -10,7 +10,7 @@ export const App: React.FC = () => {
   const { size, color, setSize, setColor, setActiveHole, activeHole } =
     useShoeCustomizer();
 
-  const [activeTab, setActiveTab] = useState<CustomizerTab>('shoe');
+  const [activeTab, setActiveTab] = useState<CustomizerTab>('charms');
   const [isMobileExpanded, setIsMobileExpanded] = useState<boolean>(false);
 
   return (
@@ -20,10 +20,10 @@ export const App: React.FC = () => {
         {/* Left Editing Window (Desktop Side Panel / Mobile Bottom Sheet) */}
         <aside
           aria-label="Customizer editing workspace"
-          className={`w-full md:w-[420px] lg:w-[450px] border-t md:border-t-0 md:border-r border-emerald-900/60 bg-[#06241a]/95 p-3 sm:p-4 md:p-5 flex flex-col gap-2.5 sm:gap-3 backdrop-blur-md shrink-0 z-20 shadow-2xl transition-all duration-300 ${
+          className={`w-full md:w-[420px] lg:w-[450px] border-t md:border-t-0 md:border-r border-emerald-900/60 bg-[#06241a]/95 p-3 sm:p-4 flex flex-col gap-2.5 backdrop-blur-md shrink-0 z-20 shadow-2xl transition-all duration-300 ${
             isMobileExpanded
-              ? 'h-[88dvh] fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
-              : 'h-[58dvh] md:h-full'
+              ? 'h-[90dvh] fixed inset-x-0 bottom-0 md:relative md:h-full md:inset-auto'
+              : 'h-[62dvh] md:h-full'
           }`}
         >
           {/* Mobile Drag / Height Toggle Handle (< 768px) */}
@@ -41,70 +41,61 @@ export const App: React.FC = () => {
             </button>
           </div>
 
-          {/* App Header with Crocs Brand Badge */}
-          <div className="flex items-center justify-between border-b border-emerald-900/60 pb-2.5 sm:pb-3 shrink-0">
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-500/20 border border-emerald-400 flex items-center justify-center font-black text-emerald-400 text-sm shadow-sm shadow-emerald-500/20">
+          {/* Dynamic Compact Header Bar */}
+          <div className="flex items-center justify-between border-b border-emerald-900/60 pb-2.5 shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 shrink-0 rounded-lg bg-emerald-500/20 border border-emerald-400 flex items-center justify-center font-black text-emerald-400 text-xs shadow-sm shadow-emerald-500/20">
                 CV
               </div>
               <div>
-                <h1 className="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">
+                <h1 className="text-sm sm:text-base font-bold tracking-tight text-white leading-tight">
                   Classic Crocs Visualizer
                 </h1>
-                <p className="text-xs text-emerald-400 font-medium">
+                <p className="text-[11px] text-emerald-400 font-medium">
                   {color.name} • {size.toUpperCase()}
                 </p>
               </div>
             </div>
-          </div>
 
-          {/* Navigation Tabs: Shoe & Color vs Jibbitz Charms */}
-          <div
-            role="tablist"
-            aria-label="Customizer tool modes"
-            className="grid grid-cols-2 p-1 bg-[#02130e]/90 rounded-xl border border-emerald-900/60 shrink-0 shadow-inner"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === 'shoe'}
-              onClick={() => setActiveTab('shoe')}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'shoe'
-                  ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400'
-                  : 'text-emerald-300/80 hover:text-white hover:bg-emerald-950/60'
-              }`}
+            {/* Dynamic Segmented Mode Switcher */}
+            <div
+              role="tablist"
+              aria-label="Customizer tool modes"
+              className="flex p-0.5 bg-[#02130e]/95 rounded-lg border border-emerald-900/80 shadow-inner"
             >
-              <span className="text-sm">👟</span>
-              <span>Shoe &amp; Color</span>
-            </button>
-
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === 'charms'}
-              onClick={() => setActiveTab('charms')}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'charms'
-                  ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400'
-                  : 'text-emerald-300/80 hover:text-white hover:bg-emerald-950/60'
-              }`}
-            >
-              <span className="text-sm">✨</span>
-              <span>Jibbitz™ Charms</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                  activeTab === 'charms'
-                    ? 'bg-emerald-600/40 text-slate-950'
-                    : 'bg-emerald-950/90 text-emerald-400 border border-emerald-800/60'
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'shoe'}
+                onClick={() => setActiveTab('shoe')}
+                className={`flex items-center gap-1 py-1 px-2.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'shoe'
+                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm shadow-emerald-500/30'
+                    : 'text-emerald-300/80 hover:text-white'
                 }`}
               >
-                1,077
-              </span>
-            </button>
+                <span>👟</span>
+                <span>Shoe</span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'charms'}
+                onClick={() => setActiveTab('charms')}
+                className={`flex items-center gap-1 py-1 px-2.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'charms'
+                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm shadow-emerald-500/30'
+                    : 'text-emerald-300/80 hover:text-white'
+                }`}
+              >
+                <span>✨</span>
+                <span>Charms</span>
+              </button>
+            </div>
           </div>
 
-          {/* Active Tool Content: Fills Entire Available Window Space with touch scrolling enabled */}
+          {/* Active Tool Content: Fills Entire Available Window Space */}
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden touch-pan-y">
             {activeTab === 'shoe' ? (
               <ShoeColorTab

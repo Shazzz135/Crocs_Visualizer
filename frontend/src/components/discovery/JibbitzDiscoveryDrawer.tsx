@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import type { JibbitzCategory, JibbitzItem } from '@crocs/shared';
 import { searchJibbitz } from '@crocs/shared';
 import { SearchBar } from './SearchBar.js';
-import { CategoryFilterBar } from './CategoryFilterBar.js';
+import { CategoryFilterDropdown } from './CategoryFilterDropdown.js';
 import { CharmGrid } from './CharmGrid.js';
 import { CharmDetailCard } from './CharmDetailCard.js';
 
@@ -48,7 +48,7 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
     return counts;
   }, [catalog]);
 
-  // Multi-select toggle handler
+  // Multi-select toggle handler for dropdown
   const handleToggleCategory = (cat: string) => {
     if (cat === 'all') {
       setSelectedCategories([]);
@@ -85,25 +85,23 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 h-full w-full gap-2 sm:gap-2.5 overflow-hidden">
-      {/* Search Bar with AI Semantic Indicator */}
-      <SearchBar
-        value={searchQuery}
-        onChange={setSearchQuery}
-        resultCount={displayedItems.length}
-        totalCount={catalog.totalCount}
-        isSemanticActive={searchQuery.trim().length > 0}
-      />
+    <div className="flex flex-col flex-1 min-h-0 h-full w-full gap-2 overflow-hidden">
+      {/* Top Filter Bar: Search + Category Dropdown Side-by-Side */}
+      <div className="flex items-center gap-2 shrink-0">
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          isSemanticActive={searchQuery.trim().length > 0}
+        />
+        <CategoryFilterDropdown
+          categories={catalog.categories}
+          selectedCategories={selectedCategories}
+          onToggleCategory={handleToggleCategory}
+          categoryCounts={categoryCounts}
+        />
+      </div>
 
-      {/* Multi-Select Category Pills */}
-      <CategoryFilterBar
-        categories={catalog.categories}
-        selectedCategories={selectedCategories}
-        onToggleCategory={handleToggleCategory}
-        categoryCounts={categoryCounts}
-      />
-
-      {/* Selected Charm Detail Card */}
+      {/* Selected Charm Detail Card (if one is chosen) */}
       {activeCharm && (
         <CharmDetailCard
           charm={activeCharm}
@@ -111,7 +109,7 @@ export const JibbitzDiscoveryDrawer: React.FC<JibbitzDiscoveryDrawerProps> = ({
         />
       )}
 
-      {/* Charms Grid with All Charms Always Loaded */}
+      {/* Charms Grid with All Charms Always Loaded & Maximum Scroll Height */}
       <CharmGrid
         key={`${searchQuery}-${selectedCategories.slice().sort().join(',')}`}
         items={displayedItems}

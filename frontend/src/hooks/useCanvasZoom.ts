@@ -48,7 +48,7 @@ export function useCanvasZoom({ pairWidth, pairHeight }: UseCanvasZoomOptions): 
   const [isPanning, setIsPanning] = useState<boolean>(false);
   const [fitScale, setFitScale] = useState<number>(1);
 
-  const stateRef = useRef({ zoom: 1, pan: { x: 0, y: 0 } });
+  const stateRef = useRef({ zoom, pan });
   useEffect(() => {
     stateRef.current = { zoom, pan };
   }, [zoom, pan]);
@@ -121,15 +121,14 @@ export function useCanvasZoom({ pairWidth, pairHeight }: UseCanvasZoomOptions): 
     return () => el.removeEventListener('wheel', onWheel);
   }, [clampZoom]);
 
-  // Click-and-drag pan (ignoring HUD buttons, charms, and hole sockets)
+  // Click-and-drag pan (ignoring HUD buttons, charms, sockets, drawer handle, and aside)
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     const target = e.target as Element | null;
     if (
-      target?.closest('[data-zoom-hud="true"]') ||
-      target?.closest('[data-charm-item="true"]') ||
-      target?.closest('[data-hole-socket="true"]') ||
-      target?.closest('[data-rotation-knob="true"]')
+      target?.closest(
+        '[data-zoom-hud="true"], [data-charm-item="true"], [data-hole-socket="true"], [data-rotation-knob="true"], [data-testid="mobile-drawer-handle"], aside'
+      )
     ) {
       return;
     }
@@ -170,6 +169,8 @@ export function useCanvasZoom({ pairWidth, pairHeight }: UseCanvasZoomOptions): 
   }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const target = e.target as Element | null;
+    if (target?.closest('[data-testid="mobile-drawer-handle"], aside')) return;
     if (e.touches.length === 2) {
       dragStartRef.current = null;
       setIsPanning(false);

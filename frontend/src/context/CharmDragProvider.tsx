@@ -118,15 +118,15 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     >
       {children}
 
-      {/* Floating Drag Overlay: Charm holds rotation angle in the air with no borders or backgrounds */}
+      {/* Floating Drag Overlay: Scaled to 44px to match on-screen charms and catalog thumbnails */}
       {dragState.isDragging && dragState.charm && dragState.pointerPos && (
         <div
           className="fixed pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2 select-none"
           style={{
             left: `${dragState.pointerPos.x}px`,
             top: `${dragState.pointerPos.y}px`,
-            width: '72px',
-            height: '72px',
+            width: '44px',
+            height: '44px',
           }}
         >
           <img
@@ -135,7 +135,7 @@ export const CharmDragProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             style={{
               transform: `rotate(${dragState.rotationDeg ?? 0}deg)`,
             }}
-            className="w-full h-full object-contain filter drop-shadow(0 8px 16px rgba(0,0,0,0.5)) pointer-events-none"
+            className="w-full h-full object-contain filter drop-shadow(0 6px 14px rgba(0,0,0,0.45)) pointer-events-none"
           />
         </div>
       )}

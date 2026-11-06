@@ -10,6 +10,7 @@ interface VentHoleSocketProps {
   radius?: number;
   wallColor?: string;
   highlightColor?: string;
+  scaleCorrection?: { sx: number; sy: number };
   onSelect?: (hole: VentHole) => void;
 }
 
@@ -22,6 +23,7 @@ export const VentHoleSocket: React.FC<VentHoleSocketProps> = ({
   radius = 11,
   wallColor = '#141820',
   highlightColor = 'rgba(255, 255, 255, 0.25)',
+  scaleCorrection = { sx: 1, sy: 1 },
   onSelect,
 }) => {
   return (
@@ -30,7 +32,7 @@ export const VentHoleSocket: React.FC<VentHoleSocketProps> = ({
       data-hole-id={hole.id}
       data-occupied={isOccupied}
       className="cursor-pointer transition-transform duration-150"
-      transform={`translate(${position.x}, ${position.y})`}
+      transform={`translate(${position.x}, ${position.y}) scale(${scaleCorrection.sx}, ${scaleCorrection.sy})`}
       onClick={(e) => {
         e.stopPropagation();
         onSelect?.(hole);

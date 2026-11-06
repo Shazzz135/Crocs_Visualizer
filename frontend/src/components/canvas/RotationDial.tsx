@@ -43,10 +43,11 @@ export const RotationDial: React.FC<RotationDialProps> = ({
       e.stopPropagation();
 
       // Smooth linear movement: dragging vertically (up/down) linearly changes rotation angle
-      // Dragging UP rotates clockwise (+deg), dragging DOWN rotates counter-clockwise (-deg)
+      // Swiping UP (dy > 0) rotates Counter-Clockwise (CCW)
+      // Swiping DOWN (dy < 0) rotates Clockwise (CW)
       const dy = drag.startY - e.clientY;
       const sensitivity = 1.0;
-      const rawAngle = drag.startAngle + Math.round(dy * sensitivity);
+      const rawAngle = drag.startAngle - Math.round(dy * sensitivity);
       const normalizedAngle = ((rawAngle % 360) + 360) % 360;
 
       onRotate(normalizedAngle);
@@ -57,44 +58,57 @@ export const RotationDial: React.FC<RotationDialProps> = ({
   const handlePointerUp = useCallback(
     (e: React.PointerEvent) => {
       if (!isRotating) return;
-      e.stopPropagation();
       try {
         (e.target as Element).releasePointerCapture(e.pointerId);
       } catch {
-        // no-op if pointer already released
+        // no-op
       }
-      dragStartRef.current = null;
       setIsRotating(false);
+      dragStartRef.current = null;
     },
     [isRotating]
   );
 
   return (
-    <g data-rotation-dial="true" className="select-none pointer-events-auto">
-      {/* Outer Halo Selection Ring */}
+    <g
+      data-rotation-dial="true"
+      className="pointer-events-auto select-none"
+      style={{ touchAction: 'none' }}
+    >
+      {/* Outer Halo Dial Guide Ring */}
       <circle
         cx={center.x}
         cy={center.y}
-        r={radius - 8}
+        r={radius}
         fill="none"
-        stroke="#10b981"
-        strokeWidth="2"
-        strokeDasharray="4 3"
-        className="opacity-90 animate-pulse pointer-events-none"
+        stroke={isRotating ? '#10b981' : 'rgba(52, 211, 153, 0.45)'}
+        strokeWidth={isRotating ? 2 : 1.5}
+        strokeDasharray={isRotating ? 'none' : '4 3'}
+        className="transition-colors duration-150"
       />
 
-      {/* Connecting Stem from Halo to Rotation Point */}
-      <line
-        x1={center.x + (radius - 8) * Math.sin(angleRad)}
-        y1={center.y - (radius - 8) * Math.cos(angleRad)}
-        x2={knobX}
-        y2={knobY}
-        stroke="#10b981"
-        strokeWidth="2"
+      {/* Center Pivot Indicator */}
+      <circle
+        cx={center.x}
+        cy={center.y}
+        r={2.5}
+        fill="#34d399"
+        opacity={0.7}
         className="pointer-events-none"
       />
 
-      {/* Prominent Linear Rotate Point (Enlarged for Windows & Mobile) */}
+      {/* Dynamic Ray from Center to Knob */}
+      <line
+        x1={center.x}
+        y1={center.y}
+        x2={knobX}
+        y2={knobY}
+        stroke={isRotating ? '#34d399' : 'rgba(52, 211, 153, 0.5)'}
+        strokeWidth={isRotating ? 2 : 1.5}
+        className="pointer-events-none"
+      />
+
+      {/* Vertical Drag Handle Knob */}
       <g
         data-rotation-knob="true"
         transform={`translate(${knobX}, ${knobY})`}
@@ -102,21 +116,26 @@ export const RotationDial: React.FC<RotationDialProps> = ({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        className="cursor-ns-resize active:cursor-ns-resize transition-transform hover:scale-115 active:scale-125"
+        className="cursor-ns-resize active:cursor-grabbing"
       >
-        {/* Large invisible hit area (r=28 / 56px touch diameter for mobile & easy click on Windows) */}
-        <circle r={28} fill="transparent" pointerEvents="all" />
+        {/* Generous touch target (r=26) */}
+        <circle r={26} fill="transparent" pointerEvents="all" />
 
-        {/* Outer Emerald Glow Ring (Enlarged r=15 for easy grabbing on Windows) */}
+        {/* Outer glowing halo ring */}
         <circle
-          r={15}
+          r={14}
           fill="#06241a"
-          stroke="#10b981"
-          strokeWidth="2.8"
-          className="shadow-xl filter drop-shadow(0 0 8px rgba(16,185,129,0.85))"
+          stroke={isRotating ? '#34d399' : '#10b981'}
+          strokeWidth={2.5}
+          style={{
+            filter: isRotating
+              ? 'drop-shadow(0 0 10px rgba(52, 211, 153, 0.95))'
+              : 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6))',
+          }}
+          className="transition-all duration-150"
         />
 
-        {/* Inner Solid Center Dot */}
+        {/* Center emerald core */}
         <circle r={5.5} fill="#34d399" />
 
         {/* Bold vertical arrows icon indicating vertical linear rotation */}

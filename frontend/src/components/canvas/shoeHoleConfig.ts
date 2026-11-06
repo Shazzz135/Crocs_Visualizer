@@ -15,12 +15,12 @@ export interface ShoeDisplaySpec {
 
 /**
  * Display dimensions per size tier based on the 350x786 reference clog viewBox.
- * Infant is intentionally wider/stubbier (lower height-to-width ratio) than Adult.
+ * Height is compressed for smaller sizes (infant/kids/youth) while preserving width.
  */
 export const SHOE_DISPLAY_SIZES: Record<CrocSize, ShoeDisplaySpec> = {
-  infant: { width: 156, height: 350, label: 'Infant' },
-  kids: { width: 172, height: 386, label: 'Kids' },
-  youth: { width: 190, height: 426, label: 'Youth' },
+  infant: { width: 210, height: 310, label: 'Infant' },
+  kids: { width: 210, height: 365, label: 'Kids' },
+  youth: { width: 210, height: 420, label: 'Youth' },
   adult: { width: 210, height: 472, label: 'Adult (Classic 1:1)' },
 };
 

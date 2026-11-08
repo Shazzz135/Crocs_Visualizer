@@ -10,4 +10,12 @@
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
+
+  /* Prevent mobile WebKit auto-zooming on input focus */
+  @media screen and (max-width: 767px) {
+    input[type="text"],
+    input[type="search"] {
+      font-size: 16px !important;
+    }
+  }
 }

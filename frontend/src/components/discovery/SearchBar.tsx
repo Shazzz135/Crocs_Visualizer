@@ -11,6 +11,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onChange,
   isSemanticActive = false,
 }) => {
+  const handleBlur = () => {
+    // Reset any vertical or horizontal viewport offset caused by mobile keyboard
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="relative flex-1 min-w-0 flex items-center">
       <div className="absolute left-2.5 text-emerald-500 pointer-events-none flex items-center">
@@ -34,9 +39,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={handleBlur}
         placeholder="Semantic search charms..."
         aria-label="Search Jibbitz charms by keyword or semantic concept"
-        className="w-full h-9 pl-8 pr-7 text-xs bg-[#02130e]/95 border border-emerald-900/80 rounded-lg text-emerald-50 placeholder-emerald-600 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 transition-all shadow-inner"
+        className="w-full h-9 pl-8 pr-7 text-base md:text-xs bg-[#02130e]/95 border border-emerald-900/80 rounded-lg text-emerald-50 placeholder-emerald-600 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 transition-all shadow-inner"
       />
 
       {value && (

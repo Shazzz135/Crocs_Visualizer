@@ -15,11 +15,10 @@ This pipeline follows a **build-time static catalog architecture**:
 ## Requirements
 
 - Python 3.10+
-- `pillow`
-- `numpy`
-- `requests`
-- `rembg` (optional for local solid-background removal)
-- `pytest` (for tests)
+- Dependencies in `requirements.txt`:
+  ```bash
+  pip install -r requirements.txt
+  ```
 
 ## Running Locally
 
